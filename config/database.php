@@ -96,7 +96,11 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
+            // Supabase exige SSL: en .env usar DB_SSLMODE=require
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // La sesión de PostgreSQL usa la hora de Bolivia (-04:00) para que
+            // CURRENT_TIMESTAMP coincida con now() de Laravel.
+            'timezone' => env('DB_TIMEZONE', 'America/La_Paz'),
         ],
 
         'sqlsrv' => [

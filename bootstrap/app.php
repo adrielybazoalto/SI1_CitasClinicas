@@ -15,6 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permiso' => \App\Http\Middleware\VerificarPermiso::class,
         ]);
+
+        // CU01: con clave temporal solo se permite cambiarla o cerrar sesión.
+        $middleware->web(append: [
+            \App\Http\Middleware\VerificarCambioClave::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
