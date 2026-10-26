@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: si1-citas-clinicas
+    env: docker
+    region: ohio
+    plan: free
+    branch: main
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        value: base64:WojBhrIcVzOPXWAV97WZlJ/k4vtrdtAKRqzKFGDfU0E=
+      - key: APP_TIMEZONE
+        value: America/La_Paz
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        value: aws-0-us-east-2.pooler.supabase.com
+      - key: DB_PORT
+        value: 6543
+      - key: DB_DATABASE
+        value: postgres
+      - key: DB_USERNAME
+        value: postgres.yqghozsgprurlplbekhi
+      - key: DB_PASSWORD
+        value: Arepaconcafe21
