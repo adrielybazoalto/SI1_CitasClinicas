@@ -11,6 +11,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+
         // Permisos por rol: ->middleware('permiso:cita.programar')
         $middleware->alias([
             'permiso' => \App\Http\Middleware\VerificarPermiso::class,
