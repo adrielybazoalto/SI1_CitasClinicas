@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Permiso extends Model
 {
     /** Permiso que el rol Administrador no puede perder (CU03). */
-    const GESTION_ROLES = 'seguridad.roles';
+    const GESTION_ROLES = 'rol.gestionar';
 
     protected $table = 'permiso';
     protected $primaryKey = 'id_permiso';

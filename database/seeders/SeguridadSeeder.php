@@ -18,57 +18,64 @@ use Illuminate\Support\Str;
  */
 class SeguridadSeeder extends Seeder
 {
-    /** codigo => [descripcion, paquete] */
+    /**
+     * codigo => [descripcion, paquete]
+     * Mismo catálogo que los datos cargados en Supabase (23 permisos).
+     */
     private const PERMISOS = [
-        'seguridad.usuarios' => ['Gestionar usuarios', 'Seguridad'],
-        'seguridad.roles' => ['Gestionar roles y permisos', 'Seguridad'],
-        'seguridad.bitacora' => ['Consultar bitácora', 'Seguridad'],
+        'usuario.gestionar' => ['Registrar, modificar y desactivar usuarios', 'Seguridad'],
+        'rol.gestionar' => ['Gestionar roles y permisos', 'Seguridad'],
+        'bitacora.ver' => ['Consultar la bitácora', 'Seguridad'],
 
-        'paciente.gestionar' => ['Gestionar pacientes', 'Pacientes'],
-        'antecedente.ver' => ['Ver antecedentes clínicos', 'Pacientes'],
-        'antecedente.editar' => ['Editar antecedentes clínicos', 'Pacientes'],
-        'perfil.gestionar' => ['Gestionar perfil propio del paciente', 'Pacientes'],
+        'paciente.gestionar' => ['Registrar y modificar pacientes', 'Pacientes'],
+        'antecedente.gestionar' => ['Registrar antecedentes clínicos', 'Pacientes'],
+        'perfil.gestionar' => ['Gestionar su propio perfil', 'Pacientes'],
 
-        'especialidad.gestionar' => ['Gestionar especialidades', 'Oferta médica'],
-        'medico.gestionar' => ['Gestionar médicos', 'Oferta médica'],
-        'horario.gestionar' => ['Gestionar horarios de atención', 'Oferta médica'],
-        'indisponibilidad.gestionar' => ['Registrar indisponibilidad médica', 'Oferta médica'],
-        'tarifa.gestionar' => ['Gestionar tarifario', 'Oferta médica'],
+        'especialidad.gestionar' => ['Gestionar especialidades', 'Oferta medica'],
+        'medico.gestionar' => ['Gestionar médicos', 'Oferta medica'],
+        'horario.gestionar' => ['Gestionar horarios de atención', 'Oferta medica'],
+        'indisponibilidad.registrar' => ['Registrar indisponibilidad médica', 'Oferta medica'],
+        'tarifa.gestionar' => ['Gestionar tarifario', 'Oferta medica'],
 
-        'ficha.consultar' => ['Consultar fichas disponibles', 'Citas'],
-        'cita.programar' => ['Programar cita', 'Citas'],
-        'cita.reprogramar' => ['Reprogramar cita', 'Citas'],
-        'cita.cancelar' => ['Cancelar cita', 'Citas'],
+        'cita.consultar' => ['Consultar citas disponibles', 'Citas'],
+        'cita.programar' => ['Programar citas', 'Citas'],
+        'cita.reprogramar' => ['Reprogramar citas', 'Citas'],
+        'cita.cancelar' => ['Cancelar citas', 'Citas'],
         'cita.asistencia' => ['Registrar asistencia e inasistencia', 'Citas'],
-        'cita.pagar' => ['Pagar ficha en línea', 'Citas'],
-        'cita.atender' => ['Marcar cita como atendida', 'Citas'],
+        'pago.en_linea' => ['Pagar citas en línea', 'Citas'],
 
-        'agenda.ver' => ['Consultar agenda médica', 'Atención'],
-        'atencion.registrar' => ['Registrar atención médica', 'Atención'],
-        'historial.ver' => ['Consultar historial del paciente', 'Atención'],
+        'caja.gestionar' => ['Abrir y cerrar caja', 'Caja'],
+        'caja.cobrar' => ['Cobrar citas en mostrador', 'Caja'],
 
-        'caja.gestionar' => ['Gestionar caja', 'Caja'],
-        'caja.cobrar' => ['Cobrar ficha en mostrador', 'Caja'],
+        'agenda.consultar' => ['Consultar agenda médica', 'Atencion'],
+        'atencion.registrar' => ['Registrar atención médica', 'Atencion'],
+        'historial.consultar' => ['Consultar historial del paciente', 'Atencion'],
 
         'reporte.generar' => ['Generar reportes', 'Reportes'],
     ];
 
-    /** Permisos iniciales por rol ('*' = todos). */
+    /** Permisos iniciales por rol (misma matriz que los datos de Supabase). */
     private const ROLES = [
-        'Administrador' => ['Acceso total al sistema', ['*']],
-        'Recepcionista' => ['Atención en mostrador y gestión de citas', [
-            'paciente.gestionar', 'antecedente.ver', 'antecedente.editar', 'ficha.consultar',
-            'cita.programar', 'cita.reprogramar', 'cita.cancelar', 'cita.asistencia',
-            'indisponibilidad.gestionar', 'agenda.ver', 'historial.ver', 'caja.gestionar',
-            'caja.cobrar', 'reporte.generar',
+        'Administrador' => ['Configura y supervisa el sistema', [
+            'usuario.gestionar', 'rol.gestionar', 'bitacora.ver', 'paciente.gestionar',
+            'antecedente.gestionar', 'especialidad.gestionar', 'medico.gestionar',
+            'horario.gestionar', 'indisponibilidad.registrar', 'tarifa.gestionar',
+            'cita.consultar', 'cita.programar', 'cita.reprogramar', 'cita.cancelar',
+            'cita.asistencia', 'caja.gestionar', 'caja.cobrar', 'agenda.consultar',
+            'historial.consultar', 'reporte.generar',
         ]],
-        'Médico' => ['Agenda y registro de atenciones', [
-            'agenda.ver', 'antecedente.ver', 'antecedente.editar', 'atencion.registrar',
-            'cita.atender', 'historial.ver',
+        'Recepcionista' => ['Gestiona pacientes, citas y caja', [
+            'paciente.gestionar', 'antecedente.gestionar', 'indisponibilidad.registrar',
+            'cita.consultar', 'cita.programar', 'cita.reprogramar', 'cita.cancelar',
+            'cita.asistencia', 'caja.gestionar', 'caja.cobrar', 'agenda.consultar',
+            'historial.consultar', 'reporte.generar',
         ]],
-        'Paciente' => ['Reserva y seguimiento de sus citas', [
-            'perfil.gestionar', 'ficha.consultar', 'cita.programar', 'cita.reprogramar',
-            'cita.cancelar', 'cita.pagar', 'historial.ver',
+        'Medico' => ['Consulta su agenda y registra atenciones', [
+            'agenda.consultar', 'antecedente.gestionar', 'atencion.registrar', 'historial.consultar',
+        ]],
+        'Paciente' => ['Reserva y consulta sus citas', [
+            'perfil.gestionar', 'cita.consultar', 'cita.programar', 'cita.reprogramar',
+            'cita.cancelar', 'pago.en_linea', 'historial.consultar',
         ]],
     ];
 
@@ -82,7 +89,7 @@ class SeguridadSeeder extends Seeder
             $rol = Rol::firstOrCreate(['nombre' => $nombre], ['descripcion' => $descripcion, 'estado' => true]);
 
             if ($rol->wasRecentlyCreated) {
-                $permisos = $codigos === ['*'] ? Permiso::query() : Permiso::whereIn('codigo', $codigos);
+                $permisos = Permiso::whereIn('codigo', $codigos);
                 $rol->permisos()->sync($permisos->pluck('id_permiso'));
             }
         }
@@ -111,7 +118,7 @@ class SeguridadSeeder extends Seeder
         User::create([
             'id_rol' => $admin->id_rol,
             'username' => 'admin',
-            'correo' => env('ADMIN_EMAIL', 'admin@vidasalud.com'),
+            'correo' => env('ADMIN_EMAIL', 'admin@vidasalud.bo'),
             'password_hash' => Hash::make($clave),
             'debe_cambiar_clave' => true,
             'estado' => true,

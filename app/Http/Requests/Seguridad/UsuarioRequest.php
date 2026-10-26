@@ -15,7 +15,7 @@ class UsuarioRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // el acceso lo controla el middleware permiso:seguridad.usuarios
+        return true; // el acceso lo controla el middleware permiso:usuario.gestionar
     }
 
     protected function prepareForValidation(): void

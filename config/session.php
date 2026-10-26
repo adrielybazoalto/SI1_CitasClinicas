@@ -143,7 +143,9 @@ return [
     |
     */
 
-    'path' => env('SESSION_PATH', '/'),
+    // Fijo en '/': en Windows, Git Bash (MSYS) convierte el valor "/" de
+    // SESSION_PATH en "C:/Program Files/Git/" y la cookie se vuelve inválida.
+    'path' => '/',
 
     /*
     |--------------------------------------------------------------------------

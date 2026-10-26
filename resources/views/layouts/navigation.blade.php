@@ -16,12 +16,12 @@
                         Inicio
                     </x-nav-link>
                     {{-- Menú según permisos del rol (CU03) --}}
-                    @if (Auth::user()->tienePermiso('seguridad.usuarios'))
+                    @if (Auth::user()->tienePermiso('usuario.gestionar'))
                         <x-nav-link :href="route('usuarios.index')" :active="request()->routeIs('usuarios.*')">
                             Usuarios
                         </x-nav-link>
                     @endif
-                    @if (Auth::user()->tienePermiso('seguridad.roles'))
+                    @if (Auth::user()->tienePermiso('rol.gestionar'))
                         <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.*')">
                             Roles y permisos
                         </x-nav-link>
@@ -81,12 +81,12 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 Inicio
             </x-responsive-nav-link>
-            @if (Auth::user()->tienePermiso('seguridad.usuarios'))
+            @if (Auth::user()->tienePermiso('usuario.gestionar'))
                 <x-responsive-nav-link :href="route('usuarios.index')" :active="request()->routeIs('usuarios.*')">
                     Usuarios
                 </x-responsive-nav-link>
             @endif
-            @if (Auth::user()->tienePermiso('seguridad.roles'))
+            @if (Auth::user()->tienePermiso('rol.gestionar'))
                 <x-responsive-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.*')">
                     Roles y permisos
                 </x-responsive-nav-link>

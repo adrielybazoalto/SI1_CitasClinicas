@@ -29,7 +29,7 @@ require __DIR__.'/auth.php';
 Route::middleware('auth')->group(function () {
     // Seguridad · CU02 Gestionar usuarios
     Route::prefix('seguridad/usuarios')->name('usuarios.')
-        ->middleware('permiso:seguridad.usuarios')
+        ->middleware('permiso:usuario.gestionar')
         ->controller(UsuarioController::class)->group(function () {
             Route::get('/', 'listarUsuarios')->name('index');
             Route::get('/nuevo', 'formularioRegistro')->name('create');
@@ -42,7 +42,7 @@ Route::middleware('auth')->group(function () {
 
     // Seguridad · CU03 Gestionar roles y permisos
     Route::prefix('seguridad/roles')->name('roles.')
-        ->middleware('permiso:seguridad.roles')
+        ->middleware('permiso:rol.gestionar')
         ->controller(RolController::class)->group(function () {
             Route::get('/', 'listarRoles')->name('index');
             Route::post('/', 'registrarRol')->name('store');

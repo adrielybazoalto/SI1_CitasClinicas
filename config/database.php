@@ -101,6 +101,11 @@ return [
             // La sesión de PostgreSQL usa la hora de Bolivia (-04:00) para que
             // CURRENT_TIMESTAMP coincida con now() de Laravel.
             'timezone' => env('DB_TIMEZONE', 'America/La_Paz'),
+            // Reutiliza la conexión entre peticiones: con Supabase abrir una
+            // conexión TLS nueva cuesta ~2,5 s por página en desarrollo local.
+            'options' => extension_loaded('pdo_pgsql') ? [
+                PDO::ATTR_PERSISTENT => (bool) env('DB_PERSISTENT', false),
+            ] : [],
         ],
 
         'sqlsrv' => [
