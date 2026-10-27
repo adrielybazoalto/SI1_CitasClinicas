@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    /* Custom clean scrollbars with purple tint */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #FAF5FF;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #D8B4FE;
+        border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #A855F7;
+    }
+
+    /* Modern selection style */
+    ::selection {
+        background-color: #E9D5FF;
+        color: #581C87;
+    }
+}
+
+@layer utilities {
+    .bg-grid-purple {
+        background-size: 32px 32px;
+        background-image: 
+            linear-gradient(to right, rgba(168, 85, 247, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+    }
+}
