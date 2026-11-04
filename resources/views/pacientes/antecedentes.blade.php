@@ -1,6 +1,8 @@
 {{-- CU06 · Gestionar antecedentes clínicos del paciente --}}
 @php
-    $volver = Auth::user()->tienePermiso('paciente.gestionar') ? route('pacientes.index') : route('dashboard');
+    $volver = ($volverCita ?? null)
+        ? route('atencion.create', $volverCita)
+        : (Auth::user()->tienePermiso('paciente.gestionar') ? route('pacientes.index') : route('dashboard'));
 @endphp
 <x-app-layout>
     <x-slot name="header">
@@ -65,6 +67,9 @@
                   class="bg-white p-6 sm:p-8 shadow-xs border border-purple-100 rounded-2xl sm:rounded-3xl space-y-6">
                 @csrf
                 @method('PUT')
+                @if ($volverCita ?? null)
+                    <input type="hidden" name="volver_cita" value="{{ $volverCita->id_cita }}">
+                @endif
 
                 <div class="flex items-center gap-2 border-b border-purple-100 pb-3">
                     <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-800 flex items-center justify-center">

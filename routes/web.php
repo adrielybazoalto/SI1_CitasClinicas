@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Atencion\AgendaController;
+use App\Http\Controllers\Atencion\AtencionController;
 use App\Http\Controllers\Citas\AsistenciaController;
 use App\Http\Controllers\Citas\CitaController;
 use App\Http\Controllers\Citas\FichaController;
@@ -156,7 +157,15 @@ Route::middleware('auth')->group(function () {
         ->middleware('permiso:agenda.consultar')
         ->name('agenda.index');
 
-    // Atención (CU21, CU22)
+    // Atención · CU21 Registrar atención médica
+    Route::prefix('atencion/citas/{cita}')->name('atencion.')
+        ->middleware('permiso:atencion.registrar')
+        ->controller(AtencionController::class)->group(function () {
+            Route::get('/atender', 'create')->name('create');
+            Route::post('/atender', 'store')->name('store');
+        });
+
+    // Atención (CU22)
     // Reportes (CU23)
     // Caja (CU18, CU19 ciclo 2)
 });

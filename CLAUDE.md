@@ -216,18 +216,18 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 - [x] La lista va ordenada por hora, con: hora, código, paciente, especialidad, estado y motivo breve.
 - [x] Filtro por estado (pendientes, confirmadas, atendidas, canceladas e inasistencias).
 - [x] **Vista semanal:** los 7 días, con la cantidad de citas por estado.
-- [x] En las citas **Confirmada**, botón "Atender" (se activa solo cuando exista la ruta `atencion.create` de CU21) que lleva a CU21. Solo aparece si el usuario tiene `atencion.registrar`.
+- [x] En las citas **Confirmada**, botón "Atender" (activo desde CU21) que lleva a CU21. Solo aparece si el usuario tiene `atencion.registrar`.
 - [x] El motivo se oculta a la recepcionista (excepción de CU20). Lo ven el médico y el administrador.
 - [x] Prueba mínima 8: "Buscar citas de un médico por fecha".
 
 #### CU21 Registrar atención médica (incluye CU22; CU06 lo extiende)
-- [ ] `AtencionService::registrar(Cita $cita, array $datos, User $usuario)` dentro de `DB::transaction`:
+- [x] `AtencionService::registrar(Cita $cita, array $datos, User $usuario)` dentro de `DB::transaction`:
   - La cita debe estar **Confirmada** (RN30) y pertenecer al médico del usuario.
   - El **diagnóstico** es obligatorio. Rangos: peso 0,5–400 kg, talla 20–250 cm, temperatura 30–45 °C, presión `^\d{2,3}/\d{2,3}$`.
   - Inserta en `atencion` (`id_cita` es único), luego `CitaEstadoService::transicionar($cita, 'Atendida', …)` y registra en la bitácora.
-- [ ] La pantalla tiene dos áreas: un **panel lateral** con los datos del paciente, los antecedentes con las **alergias resaltadas** (`alert-danger`) y las últimas atenciones; y el **formulario** de diagnóstico, tratamiento y signos vitales opcionales.
-- [ ] Enlace "Actualizar antecedentes" que abre CU06 y vuelve a esta pantalla.
-- [ ] Una cita Atendida ya no cambia de estado (RN10).
+- [x] La pantalla tiene dos áreas: un **panel lateral** con los datos del paciente, los antecedentes con las **alergias resaltadas** (`alert-danger`) y las últimas atenciones; y el **formulario** de diagnóstico, tratamiento y signos vitales opcionales.
+- [x] Enlace "Actualizar antecedentes" que abre CU06 y vuelve a esta pantalla.
+- [x] Una cita Atendida ya no cambia de estado (RN10).
 
 #### CU22 Consultar historial del paciente
 - [ ] Búsqueda de paciente por CI o nombre (reutiliza el buscador de CU05).
