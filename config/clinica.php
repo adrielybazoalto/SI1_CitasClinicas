@@ -51,6 +51,7 @@ return [
     // CU01 · Seguridad de inicio de sesión
     'max_intentos_login' => 5,
     'bloqueo_login_min'  => 15,
+    'recuperacion_clave_min' => 30, // validez del enlace de recuperación (un solo uso)
 
     // Formato de códigos correlativos
     'codigos' => [

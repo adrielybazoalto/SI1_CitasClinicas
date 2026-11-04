@@ -12,6 +12,8 @@ use App\Http\Controllers\Oferta\MedicoController;
 use App\Http\Controllers\Pacientes\AntecedenteController;
 use App\Http\Controllers\Pacientes\PacienteController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Reportes\ReporteController;
+use App\Http\Controllers\Seguridad\BitacoraController;
 use App\Http\Controllers\Seguridad\RolController;
 use App\Http\Controllers\Seguridad\UsuarioController;
 use Illuminate\Support\Facades\Route;
@@ -64,7 +66,10 @@ Route::middleware('auth')->group(function () {
             Route::put('/{rol}/permisos', 'actualizarPermisos')->name('permisos.update');
         });
 
-    // Seguridad · bitácora
+    // Seguridad · RF04 Consulta de bitácora (solo lectura)
+    Route::get('/seguridad/bitacora', [BitacoraController::class, 'index'])
+        ->middleware('permiso:bitacora.ver')
+        ->name('bitacora.index');
 
     // Pacientes · CU05 Gestionar pacientes
     Route::prefix('pacientes')->name('pacientes.')
@@ -174,6 +179,13 @@ Route::middleware('auth')->group(function () {
             Route::get('/{paciente}', 'show')->whereNumber('paciente')->name('show');
         });
 
-    // Reportes (CU23)
+    // Reportes · CU23 Generar reportes (PDF / CSV)
+    Route::prefix('reportes')->name('reportes.')
+        ->middleware('permiso:reporte.generar')
+        ->controller(ReporteController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/exportar/{formato}', 'exportar')->whereIn('formato', ['pdf', 'csv'])->name('exportar');
+        });
+
     // Caja (CU18, CU19 ciclo 2)
 });

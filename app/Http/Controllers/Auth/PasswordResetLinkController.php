@@ -20,9 +20,6 @@ use Throwable;
  */
 class PasswordResetLinkController extends Controller
 {
-    /** Minutos de validez del enlace. */
-    private const VALIDEZ_MIN = 60;
-
     public function __construct(private BitacoraService $bitacora)
     {
     }
@@ -55,7 +52,7 @@ class PasswordResetLinkController extends Controller
             DB::table('recuperacion_clave')->insert([
                 'id_usuario' => $usuario->id_usuario,
                 'token_hash' => hash('sha256', $token),
-                'expira_en' => now()->addMinutes(self::VALIDEZ_MIN),
+                'expira_en' => now()->addMinutes((int) config('clinica.recuperacion_clave_min', 30)),
                 'creado_en' => now(),
             ]);
 
@@ -64,7 +61,7 @@ class PasswordResetLinkController extends Controller
             try {
                 Mail::raw(
                     "Hola {$usuario->username}:\n\nPara restablecer su contraseña de Vida Salud ingrese al siguiente enlace "
-                    ."(válido por ".self::VALIDEZ_MIN." minutos):\n\n{$enlace}\n\nSi usted no lo solicitó, ignore este mensaje.",
+                    ."(válido por ".config('clinica.recuperacion_clave_min', 30)." minutos):\n\n{$enlace}\n\nSi usted no lo solicitó, ignore este mensaje.",
                     fn ($m) => $m->to($usuario->correo)->subject('Vida Salud · Recuperar contraseña')
                 );
             } catch (Throwable $e) {

@@ -66,7 +66,7 @@ Un paquete **nunca** llama a otro que esté por encima de él en esta lista. Las
 
 | Paquete | CU | Ciclo | Estado |
 |---|---|:-:|---|
-| P1 | CU01, CU02, CU03 | 1 | ✅ Hecho · ⚠️ falta la pantalla de consulta de bitácora (`BitacoraController` vacío) |
+| P1 | CU01, CU02, CU03 | 1 | ✅ Hecho · ✅ consulta de bitácora (rama `p6-reportes`) |
 | P2 | CU05, CU06 | 1 | ✅ Hecho |
 | P2 | CU04 | 2 | ⬜ Vacío (`PerfilController`) |
 | P3 | CU07, CU08, CU09 | 1 | ✅ Hecho |
@@ -74,7 +74,7 @@ Un paquete **nunca** llama a otro que esté por encima de él en esta lista. Las
 | P4 | CU12, CU13, CU15, CU16, CU17 | 1 | ✅ Hecho en la rama `adriely` (falta llevarlo a `main`) |
 | P4 | CU14 + voz | 2 | ⬜ Vacíos (`PagoController`, `PayPalService`) |
 | P5 | CU20, CU21, CU22 | 1 | ✅ Hecho en la rama `p5-atencion` (04/11) |
-| P6 | CU23 | 1 | ⚠️ Solo esqueleto (`ReporteService` vacío) |
+| P6 | CU23 | 1 | ✅ Hecho en la rama `p6-reportes` (04/11) |
 | P6 | CU18, CU19 | 2 | ⬜ Vacíos (`CajaService`, `CobroController`) |
 
 ---
@@ -242,18 +242,18 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 **Permisos:** `reporte.generar`; `bitacora.ver` para los reportes exclusivos del administrador.
 **Archivos:** `Controllers/Reportes/ReporteController.php`, `Services/ReporteService.php`, `views/reportes/` y `views/pdf/`.
 
-- [ ] Pantalla con un selector de reporte, filtros (rango de fechas, médico, especialidad, estado) y una tabla con **subtotales y total general**.
-- [ ] Reportes mínimos: citas programadas para una fecha · citas por médico · por especialidad · por estado · pacientes registrados · totales de atendidas, canceladas e inasistencias por periodo · agenda diaria de cada médico.
-- [ ] Solo para el administrador: **consulta de bitácora** e **ingresos por periodo** (cobros − reembolsos; este último se activa cuando exista CU19).
-- [ ] Exportación a **PDF** (dompdf, con logo y fecha de emisión) y a **CSV** UTF-8 con BOM, para que Excel lo abra con tildes. La exportación respeta los filtros aplicados.
-- [ ] Validaciones: fecha de inicio ≤ fecha de fin; si no hay resultados, mostrar un mensaje.
-- [ ] Las consultas van en `ReporteService`, agrupadas en la base de datos (`groupBy`), sin cálculos en las vistas.
+- [x] Pantalla con un selector de reporte, filtros (rango de fechas, médico, especialidad, estado) y una tabla con **subtotales y total general**.
+- [x] Reportes mínimos: citas programadas para una fecha · citas por médico · por especialidad · por estado · pacientes registrados · totales de atendidas, canceladas e inasistencias por periodo · agenda diaria de cada médico.
+- [x] Solo para el administrador: **consulta de bitácora** e **ingresos por periodo** (cobros − reembolsos; ya funciona con los pagos de la población de demostración).
+- [x] Exportación a **PDF** (dompdf, con logo y fecha de emisión) y a **CSV** UTF-8 con BOM, para que Excel lo abra con tildes. La exportación respeta los filtros aplicados.
+- [x] Validaciones: fecha de inicio ≤ fecha de fin; si no hay resultados, mostrar un mensaje.
+- [x] Las consultas van en `ReporteService`, agrupadas en la base de datos (`groupBy`), sin cálculos en las vistas.
 
 ### P1 · Bitácora (RF04)
 
-- [ ] `BitacoraController@index` con `permiso:bitacora.ver`: tabla paginada, solo lectura, con filtros por fecha, usuario, acción y tabla.
-- [ ] Revisa que `BitacoraService` se llame en: login y logout, CRUD de usuarios, roles, pacientes, médicos y horarios, y al crear, reprogramar, cancelar y atender citas.
-- [ ] Revisa lo que debe cumplir CU01: bloqueo después de 5 intentos por 15 minutos, cierre de sesión a los 15 minutos de inactividad, recuperación por correo (enlace de 30 minutos y un solo uso) y contraseña temporal (`VerificarCambioClave`).
+- [x] `BitacoraController@index` con `permiso:bitacora.ver`: tabla paginada, solo lectura, con filtros por fecha, usuario, acción y tabla.
+- [x] Revisa que `BitacoraService` se llame en: login y logout, CRUD de usuarios, roles, pacientes, médicos y horarios, y al crear, reprogramar, cancelar y atender citas.
+- [x] Revisa lo que debe cumplir CU01: bloqueo después de 5 intentos por 15 minutos, cierre de sesión a los 15 minutos de inactividad, recuperación por correo (enlace de 30 minutos — antes 60, ahora en `config/clinica.php` — y un solo uso) y contraseña temporal (`VerificarCambioClave`).
 
 ---
 
