@@ -37,6 +37,10 @@ Si dos fuentes se contradicen, gana el PDF. Avísale a la usuaria en vez de deci
 - Subir `.env`, contraseñas o claves al repositorio.
 - Hacer `git push`, merge a `main` o cualquier acción destructiva **sin preguntar antes**.
 
+### Rama de trabajo
+
+Todo se trabaja y se commitea en la rama **`amalia`** (decisión de la usuaria, 04/11). No crear ramas por paquete.
+
 ### Al terminar cada CU
 
 1. Prueba manual con los usuarios de demostración.
@@ -66,15 +70,15 @@ Un paquete **nunca** llama a otro que esté por encima de él en esta lista. Las
 
 | Paquete | CU | Ciclo | Estado |
 |---|---|:-:|---|
-| P1 | CU01, CU02, CU03 | 1 | ✅ Hecho · ✅ consulta de bitácora (rama `p6-reportes`) |
+| P1 | CU01, CU02, CU03 | 1 | ✅ Hecho · ✅ consulta de bitácora (`amalia`) |
 | P2 | CU05, CU06 | 1 | ✅ Hecho |
 | P2 | CU04 | 2 | ⬜ Vacío (`PerfilController`) |
 | P3 | CU07, CU08, CU09 | 1 | ✅ Hecho |
 | P3 | CU10, CU11 | 2 | ⬜ Vacíos (`IndisponibilidadController`, `TarifaController`) |
 | P4 | CU12, CU13, CU15, CU16, CU17 | 1 | ✅ Hecho en la rama `adriely` (falta llevarlo a `main`) |
 | P4 | CU14 + voz | 2 | ⬜ Vacíos (`PagoController`, `PayPalService`) |
-| P5 | CU20, CU21, CU22 | 1 | ✅ Hecho en la rama `p5-atencion` (04/11) |
-| P6 | CU23 | 1 | ✅ Hecho en la rama `p6-reportes` (04/11) |
+| P5 | CU20, CU21, CU22 | 1 | ✅ Hecho en `amalia` (04/11) |
+| P6 | CU23 | 1 | ✅ Hecho en `amalia` (04/11) |
 | P6 | CU18, CU19 | 2 | ⬜ Vacíos (`CajaService`, `CobroController`) |
 
 ---
@@ -199,7 +203,7 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 - [x] Ejecuta `git fetch origin` y muestra `git log --oneline origin/main..origin/adriely` y `git log --oneline origin/main..amalia`.
 - [ ] Propón el orden del merge (primero `adriely` → `main`, luego `amalia` → `main`), resuelve los conflictos y **pide confirmación antes de cada push**.
 - [ ] Después del merge, en `main`: `composer install`, `npm install`, `npm run build`, `composer test`. Todo debe pasar.
-- [ ] A partir de aquí, trabaja en una rama por paquete (`p5-atencion`, `p6-reportes`…) y súbela a `main` con un Pull Request.
+- [x] ~~Una rama por paquete~~ → **Decisión de la usuaria (04/11): todo el trabajo va en la rama `amalia`.** No crear ramas nuevas; `amalia` se sube a `main` con un Pull Request cuando ella lo apruebe.
 
 ---
 
