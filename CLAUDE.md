@@ -158,7 +158,7 @@ Debe existir lo siguiente. Lo que falte se agrega con **una migración nueva** q
 
 - [x] `ex_cita_sin_superposicion` (EXCLUDE) y los CHECK de `cita`, `horario`, `atencion`, `pago` y `caja`.
 - [x] El índice único `lower(trim(nombre))` de `especialidad` y el índice parcial `ux_caja_abierta`.
-- [ ] El trigger de **bitácora inmutable** (RNF08) — migración `2026_11_04_000001` creada, falta aplicarla en Supabase, que no existe en las migraciones actuales: una función que lance `RAISE EXCEPTION` ante un `UPDATE` o `DELETE` sobre `bitacora`.
+- [x] El trigger de **bitácora inmutable** (RNF08) — migración `2026_11_04_000001` aplicada en Supabase el 04/11, que no existe en las migraciones actuales: una función que lance `RAISE EXCEPTION` ante un `UPDATE` o `DELETE` sobre `bitacora`.
 - [x] La zona horaria `America/La_Paz`. Si no lo está: `ALTER DATABASE postgres SET timezone TO 'America/La_Paz';`
 
 ### 0.5 Población de datos (no existe en el repositorio)
