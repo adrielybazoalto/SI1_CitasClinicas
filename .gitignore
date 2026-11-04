@@ -25,3 +25,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Respaldos de entorno (pueden contener secretos)
+.env.*.bak
+*.bak
