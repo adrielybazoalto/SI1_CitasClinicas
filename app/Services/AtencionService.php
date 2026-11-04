@@ -5,9 +5,11 @@ namespace App\Services;
 use App\Models\Atencion;
 use App\Models\Cita;
 use App\Models\Medico;
+use App\Models\Paciente;
 use App\Models\Rol;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -17,6 +19,7 @@ use Illuminate\Validation\ValidationException;
  *
  * CU20 Consultar agenda médica: agenda diaria y resumen semanal por médico.
  * CU21 Registrar atención médica: diagnóstico, tratamiento y signos vitales.
+ * CU22 Consultar historial del paciente.
  */
 class AtencionService
 {
@@ -129,6 +132,66 @@ class AtencionService
         }
 
         return $semana;
+    }
+
+    /* ------------------------------------------------------------------
+     | CU22 · Consultar historial del paciente
+     * ------------------------------------------------------------------ */
+
+    /** Paciente vinculado a la cuenta (solo para el rol Paciente). */
+    public function pacienteDe(User $usuario): ?Paciente
+    {
+        return $usuario->rol?->nombre === Rol::PACIENTE
+            ? Paciente::query()->where('id_usuario', $usuario->id_usuario)->first()
+            : null;
+    }
+
+    /** ¿Es una cuenta de paciente? Solo puede ver su propio historial. */
+    public function esPaciente(User $usuario): bool
+    {
+        return $usuario->rol?->nombre === Rol::PACIENTE;
+    }
+
+    /**
+     * El detalle clínico (diagnóstico, tratamiento y signos) solo lo ve
+     * quien registra atenciones; recepción y paciente ven solo la cita.
+     */
+    public function puedeVerDetalleClinico(User $usuario): bool
+    {
+        return ! $this->esPaciente($usuario) && $usuario->tienePermiso('atencion.registrar');
+    }
+
+    /**
+     * Citas del paciente en orden cronológico descendente, incluidas las
+     * canceladas y las inasistencias.
+     *
+     * @param array{desde?: ?string, hasta?: ?string, medico?: ?int, estado?: ?string} $filtros
+     */
+    public function historial(Paciente $paciente, array $filtros, bool $conDetalleClinico): LengthAwarePaginator
+    {
+        return Cita::query()
+            ->with(array_merge(
+                ['medico:id_medico,nombres,apellidos', 'especialidad:id_especialidad,nombre'],
+                $conDetalleClinico ? ['atencion'] : [],
+            ))
+            ->where('id_paciente', $paciente->id_paciente)
+            ->when(filled($filtros['desde'] ?? null), fn ($q) => $q->whereDate('fecha', '>=', $filtros['desde']))
+            ->when(filled($filtros['hasta'] ?? null), fn ($q) => $q->whereDate('fecha', '<=', $filtros['hasta']))
+            ->when(filled($filtros['medico'] ?? null), fn ($q) => $q->where('id_medico', $filtros['medico']))
+            ->when(filled($filtros['estado'] ?? null), fn ($q) => $q->where('estado', $filtros['estado']))
+            ->orderByDesc('fecha')
+            ->orderByDesc('hora_inicio')
+            ->paginate(15)
+            ->withQueryString();
+    }
+
+    /** Médicos con los que el paciente tuvo alguna cita (para el filtro). */
+    public function medicosDelPaciente(Paciente $paciente): Collection
+    {
+        return Medico::query()
+            ->whereIn('id_medico', Cita::query()->where('id_paciente', $paciente->id_paciente)->select('id_medico'))
+            ->orderBy('apellidos')
+            ->get(['id_medico', 'nombres', 'apellidos']);
     }
 
     /* ------------------------------------------------------------------

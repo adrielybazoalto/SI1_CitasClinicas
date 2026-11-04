@@ -73,7 +73,7 @@ Un paquete **nunca** llama a otro que esté por encima de él en esta lista. Las
 | P3 | CU10, CU11 | 2 | ⬜ Vacíos (`IndisponibilidadController`, `TarifaController`) |
 | P4 | CU12, CU13, CU15, CU16, CU17 | 1 | ✅ Hecho en la rama `adriely` (falta llevarlo a `main`) |
 | P4 | CU14 + voz | 2 | ⬜ Vacíos (`PagoController`, `PayPalService`) |
-| P5 | CU20, CU21, CU22 | 1 | ⚠️ Solo esqueleto, carpeta de vistas vacía |
+| P5 | CU20, CU21, CU22 | 1 | ✅ Hecho en la rama `p5-atencion` (04/11) |
 | P6 | CU23 | 1 | ⚠️ Solo esqueleto (`ReporteService` vacío) |
 | P6 | CU18, CU19 | 2 | ⬜ Vacíos (`CajaService`, `CobroController`) |
 
@@ -230,12 +230,12 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 - [x] Una cita Atendida ya no cambia de estado (RN10).
 
 #### CU22 Consultar historial del paciente
-- [ ] Búsqueda de paciente por CI o nombre (reutiliza el buscador de CU05).
-- [ ] Citas en orden cronológico **descendente**, **incluidas las canceladas y las inasistencias**: fecha y hora, médico, especialidad, estado y fecha de registro.
-- [ ] Filtros por rango de fechas, médico y estado.
-- [ ] Detalle de una cita Atendida (diagnóstico, tratamiento y signos): **solo** lo ve quien tiene `atencion.registrar`. La recepcionista ve solo los datos de la cita.
-- [ ] El **paciente** ve directamente su propio historial, sin el detalle clínico, y no puede ver el de otro paciente.
-- [ ] Prueba mínima 7: "Consultar historial de un paciente".
+- [x] Búsqueda de paciente por CI o nombre (reutiliza el buscador de CU05).
+- [x] Citas en orden cronológico **descendente**, **incluidas las canceladas y las inasistencias**: fecha y hora, médico, especialidad, estado y fecha de registro.
+- [x] Filtros por rango de fechas, médico y estado.
+- [x] Detalle de una cita Atendida (diagnóstico, tratamiento y signos): **solo** lo ve quien tiene `atencion.registrar`. La recepcionista ve solo los datos de la cita.
+- [x] El **paciente** ve directamente su propio historial, sin el detalle clínico, y no puede ver el de otro paciente.
+- [x] Prueba mínima 7: "Consultar historial de un paciente".
 
 ### P6 · Reportes (CU23, ciclo 1)
 
