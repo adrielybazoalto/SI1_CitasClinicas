@@ -17,8 +17,10 @@ return new class extends Migration
             $table->date('vigente_hasta')->nullable();
             $table->foreign('id_especialidad')->references('id_especialidad')->on('especialidad')->onDelete('restrict');
         });
-        DB::statement('ALTER TABLE tarifa ADD CONSTRAINT chk_tarifa_monto CHECK (monto > 0)');
-        DB::statement('ALTER TABLE tarifa ADD CONSTRAINT chk_tarifa_vigencia CHECK (vigente_hasta IS NULL OR vigente_hasta >= vigente_desde)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE tarifa ADD CONSTRAINT chk_tarifa_monto CHECK (monto > 0)');
+            DB::statement('ALTER TABLE tarifa ADD CONSTRAINT chk_tarifa_vigencia CHECK (vigente_hasta IS NULL OR vigente_hasta >= vigente_desde)');
+        }
     }
 
     public function down(): void

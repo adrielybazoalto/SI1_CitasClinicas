@@ -24,7 +24,9 @@ return new class extends Migration
             $table->foreign('id_paciente')->references('id_paciente')->on('paciente')->onDelete('cascade');
             $table->foreign('actualizado_por')->references('id_usuario')->on('usuario')->onDelete('set null');
         });
-        DB::statement("ALTER TABLE antecedente ADD CONSTRAINT chk_antecedente_tipo_sangre CHECK (tipo_sangre IN ('A+','A-','B+','B-','AB+','AB-','O+','O-'))");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER TABLE antecedente ADD CONSTRAINT chk_antecedente_tipo_sangre CHECK (tipo_sangre IN ('A+','A-','B+','B-','AB+','AB-','O+','O-'))");
+        }
     }
 
     public function down(): void

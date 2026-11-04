@@ -19,7 +19,9 @@ return new class extends Migration
             $table->foreign('id_medico')->references('id_medico')->on('medico')->onDelete('restrict');
             $table->foreign('registrado_por')->references('id_usuario')->on('usuario')->onDelete('set null');
         });
-        DB::statement('ALTER TABLE indisponibilidad ADD CONSTRAINT chk_indisponibilidad_fechas CHECK (fin > inicio)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE indisponibilidad ADD CONSTRAINT chk_indisponibilidad_fechas CHECK (fin > inicio)');
+        }
     }
 
     public function down(): void

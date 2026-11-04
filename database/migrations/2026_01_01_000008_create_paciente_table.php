@@ -26,8 +26,10 @@ return new class extends Migration
             $table->timestamp('creado_en')->useCurrent();
             $table->foreign('id_usuario')->references('id_usuario')->on('usuario')->onDelete('set null');
         });
-        DB::statement("ALTER TABLE paciente ADD CONSTRAINT chk_paciente_fecha_nac CHECK (fecha_nacimiento <= CURRENT_DATE)");
-        DB::statement("ALTER TABLE paciente ADD CONSTRAINT chk_paciente_sexo CHECK (sexo IN ('M','F','O'))");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER TABLE paciente ADD CONSTRAINT chk_paciente_fecha_nac CHECK (fecha_nacimiento <= CURRENT_DATE)");
+            DB::statement("ALTER TABLE paciente ADD CONSTRAINT chk_paciente_sexo CHECK (sexo IN ('M','F','O'))");
+        }
     }
 
     public function down(): void

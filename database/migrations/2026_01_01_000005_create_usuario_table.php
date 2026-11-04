@@ -22,7 +22,9 @@ return new class extends Migration
             $table->timestamp('creado_en')->useCurrent();
             $table->foreign('id_rol')->references('id_rol')->on('rol')->onDelete('restrict');
         });
-        DB::statement('ALTER TABLE usuario ADD CONSTRAINT chk_usuario_intentos_fallidos CHECK (intentos_fallidos >= 0)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE usuario ADD CONSTRAINT chk_usuario_intentos_fallidos CHECK (intentos_fallidos >= 0)');
+        }
     }
 
     public function down(): void

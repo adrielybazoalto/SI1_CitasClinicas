@@ -18,7 +18,9 @@ return new class extends Migration
             $table->timestamp('creado_en')->useCurrent();
             $table->foreign('id_usuario')->references('id_usuario')->on('usuario')->onDelete('cascade');
         });
-        DB::statement('ALTER TABLE recuperacion_clave ADD CONSTRAINT chk_recuperacion_expira CHECK (expira_en > creado_en)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE recuperacion_clave ADD CONSTRAINT chk_recuperacion_expira CHECK (expira_en > creado_en)');
+        }
     }
 
     public function down(): void

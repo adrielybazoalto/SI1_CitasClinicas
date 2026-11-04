@@ -24,9 +24,11 @@ return new class extends Migration
                 ->on('medico_especialidad')
                 ->onDelete('restrict');
         });
-        DB::statement('ALTER TABLE horario ADD CONSTRAINT chk_horario_dia_semana CHECK (dia_semana BETWEEN 1 AND 7)');
-        DB::statement('ALTER TABLE horario ADD CONSTRAINT chk_horario_duracion CHECK (duracion_min BETWEEN 10 AND 120)');
-        DB::statement('ALTER TABLE horario ADD CONSTRAINT chk_horario_horas CHECK (hora_fin > hora_inicio)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE horario ADD CONSTRAINT chk_horario_dia_semana CHECK (dia_semana BETWEEN 1 AND 7)');
+            DB::statement('ALTER TABLE horario ADD CONSTRAINT chk_horario_duracion CHECK (duracion_min BETWEEN 10 AND 120)');
+            DB::statement('ALTER TABLE horario ADD CONSTRAINT chk_horario_horas CHECK (hora_fin > hora_inicio)');
+        }
     }
 
     public function down(): void

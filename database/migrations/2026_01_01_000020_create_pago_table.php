@@ -24,10 +24,12 @@ return new class extends Migration
             $table->foreign('id_caja')->references('id_caja')->on('caja')->onDelete('restrict');
             $table->foreign('registrado_por')->references('id_usuario')->on('usuario')->onDelete('set null');
         });
-        DB::statement("ALTER TABLE pago ADD CONSTRAINT chk_pago_tipo CHECK (tipo IN ('COBRO','REEMBOLSO'))");
-        DB::statement("ALTER TABLE pago ADD CONSTRAINT chk_pago_metodo CHECK (metodo IN ('EFECTIVO','TARJETA','TRANSFERENCIA','PAYPAL','QR'))");
-        DB::statement('ALTER TABLE pago ADD CONSTRAINT chk_pago_monto CHECK (monto > 0)');
-        DB::statement("ALTER TABLE pago ADD CONSTRAINT chk_pago_estado CHECK (estado IN ('PENDIENTE','APROBADO','RECHAZADO'))");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER TABLE pago ADD CONSTRAINT chk_pago_tipo CHECK (tipo IN ('COBRO','REEMBOLSO'))");
+            DB::statement("ALTER TABLE pago ADD CONSTRAINT chk_pago_metodo CHECK (metodo IN ('EFECTIVO','TARJETA','TRANSFERENCIA','PAYPAL','QR'))");
+            DB::statement('ALTER TABLE pago ADD CONSTRAINT chk_pago_monto CHECK (monto > 0)');
+            DB::statement("ALTER TABLE pago ADD CONSTRAINT chk_pago_estado CHECK (estado IN ('PENDIENTE','APROBADO','RECHAZADO'))");
+        }
     }
 
     public function down(): void

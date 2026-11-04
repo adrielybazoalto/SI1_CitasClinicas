@@ -1,4 +1,13 @@
 <nav x-data="{ open: false }" class="bg-white/95 backdrop-blur-md border-b border-purple-100 sticky top-0 z-40 shadow-sm shadow-purple-950/5">
+    @php
+        $puedeOferta = Auth::user()->tienePermiso('especialidad.gestionar')
+            || Auth::user()->tienePermiso('medico.gestionar')
+            || Auth::user()->tienePermiso('horario.gestionar');
+        $rutaOferta = Auth::user()->tienePermiso('especialidad.gestionar')
+            ? route('especialidades.index')
+            : (Auth::user()->tienePermiso('medico.gestionar') ? route('medicos.index') : route('horarios.index'));
+    @endphp
+
     <!-- Menú de Navegación Principal -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -20,6 +29,39 @@
                             Inicio
                         </span>
                     </x-nav-link>
+
+                    @if (Auth::user()->tienePermiso('paciente.gestionar'))
+                        <x-nav-link :href="route('pacientes.index')" :active="request()->routeIs('pacientes.*')">
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-4 h-4 {{ request()->routeIs('pacientes.*') ? 'text-purple-700' : 'text-gray-400 group-hover:text-purple-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                                </svg>
+                                Pacientes
+                            </span>
+                        </x-nav-link>
+                    @endif
+
+                    @if ($puedeOferta)
+                        <x-nav-link :href="$rutaOferta" :active="request()->routeIs('especialidades.*', 'medicos.*', 'horarios.*')">
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-4 h-4 {{ request()->routeIs('especialidades.*', 'medicos.*', 'horarios.*') ? 'text-purple-700' : 'text-gray-400 group-hover:text-purple-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                                Oferta médica
+                            </span>
+                        </x-nav-link>
+                    @endif
+
+                    @if (Auth::user()->tienePermiso('cita.consultar') || Auth::user()->tienePermiso('cita.asistencia'))
+                        <x-nav-link :href="route('citas.index')" :active="request()->routeIs('citas.*', 'fichas.*')">
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-4 h-4 {{ request()->routeIs('citas.*', 'fichas.*') ? 'text-purple-700' : 'text-gray-400 group-hover:text-purple-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                Citas
+                            </span>
+                        </x-nav-link>
+                    @endif
 
                     {{-- Menú según permisos del rol (CU03) --}}
                     @if (Auth::user()->tienePermiso('usuario.gestionar'))
@@ -122,6 +164,39 @@
                     Inicio
                 </span>
             </x-responsive-nav-link>
+
+            @if (Auth::user()->tienePermiso('paciente.gestionar'))
+                <x-responsive-nav-link :href="route('pacientes.index')" :active="request()->routeIs('pacientes.*')">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 {{ request()->routeIs('pacientes.*') ? 'text-purple-700' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        Pacientes
+                    </span>
+                </x-responsive-nav-link>
+            @endif
+
+            @if ($puedeOferta)
+                <x-responsive-nav-link :href="$rutaOferta" :active="request()->routeIs('especialidades.*', 'medicos.*', 'horarios.*')">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 {{ request()->routeIs('especialidades.*', 'medicos.*', 'horarios.*') ? 'text-purple-700' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                        Oferta médica
+                    </span>
+                </x-responsive-nav-link>
+            @endif
+
+            @if (Auth::user()->tienePermiso('cita.consultar') || Auth::user()->tienePermiso('cita.asistencia'))
+                <x-responsive-nav-link :href="route('citas.index')" :active="request()->routeIs('citas.*', 'fichas.*')">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 {{ request()->routeIs('citas.*', 'fichas.*') ? 'text-purple-700' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Citas
+                    </span>
+                </x-responsive-nav-link>
+            @endif
 
             @if (Auth::user()->tienePermiso('usuario.gestionar'))
                 <x-responsive-nav-link :href="route('usuarios.index')" :active="request()->routeIs('usuarios.*')">

@@ -36,14 +36,16 @@ return new class extends Migration
             $table->foreign('id_especialidad')->references('id_especialidad')->on('especialidad')->onDelete('restrict');
             $table->foreign('creado_por')->references('id_usuario')->on('usuario')->onDelete('restrict');
         });
-        DB::statement('ALTER TABLE cita ADD CONSTRAINT chk_cita_nro_cita CHECK (nro_cita > 0)');
-        DB::statement('ALTER TABLE cita ADD CONSTRAINT chk_cita_canal CHECK (canal IN (\'LINEA\',\'MOSTRADOR\'))');
-        DB::statement("ALTER TABLE cita ADD CONSTRAINT chk_cita_estado CHECK (estado IN ('Programada','Confirmada','Atendida','Cancelada','Inasistencia'))");
-        DB::statement("ALTER TABLE cita ADD CONSTRAINT chk_cita_estado_pago CHECK (estado_pago IN ('Pendiente','Pagado','Reembolsado'))");
-        DB::statement('ALTER TABLE cita ADD CONSTRAINT chk_cita_monto CHECK (monto IS NULL OR monto >= 0)');
-        DB::statement('ALTER TABLE cita ADD CONSTRAINT chk_cita_veces_reprog CHECK (veces_reprogramada >= 0)');
-        DB::statement('ALTER TABLE cita ADD CONSTRAINT chk_cita_horas CHECK (hora_fin > hora_inicio)');
-        DB::statement("ALTER TABLE cita ADD CONSTRAINT ex_cita_sin_superposicion EXCLUDE USING gist (id_medico WITH =, tsrange(fecha + hora_inicio, fecha + hora_fin) WITH &&) WHERE (estado <> 'Cancelada' AND sobrecupo = FALSE)");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE cita ADD CONSTRAINT chk_cita_nro_cita CHECK (nro_cita > 0)');
+            DB::statement('ALTER TABLE cita ADD CONSTRAINT chk_cita_canal CHECK (canal IN (\'LINEA\',\'MOSTRADOR\'))');
+            DB::statement("ALTER TABLE cita ADD CONSTRAINT chk_cita_estado CHECK (estado IN ('Programada','Confirmada','Atendida','Cancelada','Inasistencia'))");
+            DB::statement("ALTER TABLE cita ADD CONSTRAINT chk_cita_estado_pago CHECK (estado_pago IN ('Pendiente','Pagado','Reembolsado'))");
+            DB::statement('ALTER TABLE cita ADD CONSTRAINT chk_cita_monto CHECK (monto IS NULL OR monto >= 0)');
+            DB::statement('ALTER TABLE cita ADD CONSTRAINT chk_cita_veces_reprog CHECK (veces_reprogramada >= 0)');
+            DB::statement('ALTER TABLE cita ADD CONSTRAINT chk_cita_horas CHECK (hora_fin > hora_inicio)');
+            DB::statement("ALTER TABLE cita ADD CONSTRAINT ex_cita_sin_superposicion EXCLUDE USING gist (id_medico WITH =, tsrange(fecha + hora_inicio, fecha + hora_fin) WITH &&) WHERE (estado <> 'Cancelada' AND sobrecupo = FALSE)");
+        }
     }
 
     public function down(): void

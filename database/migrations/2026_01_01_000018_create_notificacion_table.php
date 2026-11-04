@@ -20,8 +20,10 @@ return new class extends Migration
             $table->foreign('id_paciente')->references('id_paciente')->on('paciente')->onDelete('cascade');
             $table->foreign('id_cita')->references('id_cita')->on('cita')->onDelete('cascade');
         });
-        DB::statement("ALTER TABLE notificacion ADD CONSTRAINT chk_notificacion_tipo CHECK (tipo IN ('RECORDATORIO','REPROGRAMACION','CANCELACION','COMPROBANTE'))");
-        DB::statement("ALTER TABLE notificacion ADD CONSTRAINT chk_notificacion_estado CHECK (estado IN ('PENDIENTE','ENVIADA','FALLIDA'))");
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("ALTER TABLE notificacion ADD CONSTRAINT chk_notificacion_tipo CHECK (tipo IN ('RECORDATORIO','REPROGRAMACION','CANCELACION','COMPROBANTE'))");
+            DB::statement("ALTER TABLE notificacion ADD CONSTRAINT chk_notificacion_estado CHECK (estado IN ('PENDIENTE','ENVIADA','FALLIDA'))");
+        }
     }
 
     public function down(): void

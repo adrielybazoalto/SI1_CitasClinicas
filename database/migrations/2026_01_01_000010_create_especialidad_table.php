@@ -16,7 +16,9 @@ return new class extends Migration
             $table->smallInteger('duracion_min')->default(30);
             $table->boolean('estado')->default(true);
         });
-        DB::statement('ALTER TABLE especialidad ADD CONSTRAINT chk_especialidad_duracion CHECK (duracion_min BETWEEN 10 AND 120)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE especialidad ADD CONSTRAINT chk_especialidad_duracion CHECK (duracion_min BETWEEN 10 AND 120)');
+        }
         DB::statement('CREATE UNIQUE INDEX ux_especialidad_nombre ON especialidad (lower(trim(nombre)))');
     }
 

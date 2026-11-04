@@ -48,6 +48,80 @@
 
             <!-- Accesos Rápidos a Módulos según permisos -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {{-- Módulo de Pacientes (CU05/CU06) --}}
+                @if (Auth::user()->tienePermiso('paciente.gestionar'))
+                    <a href="{{ route('pacientes.index') }}" class="group bg-white p-6 rounded-2xl border border-purple-100 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-purple-300 transition-all duration-200 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-800 flex items-center justify-center group-hover:bg-purple-800 group-hover:text-white transition-colors duration-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-purple-950 group-hover:text-purple-700 transition-colors">Gestión de Pacientes</h3>
+                                <p class="text-xs text-gray-500 mt-1">Registro de pacientes, cuentas de acceso y antecedentes clínicos.</p>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-purple-50 flex items-center justify-between text-xs font-semibold text-purple-700 group-hover:text-purple-900">
+                            <span>Acceder al módulo</span>
+                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </a>
+                @endif
+
+                {{-- Módulo de Citas (CU12, CU13, CU15, CU16, CU17) --}}
+                @if (Auth::user()->tienePermiso('cita.consultar') || Auth::user()->tienePermiso('cita.asistencia'))
+                    <a href="{{ route('citas.index') }}" class="group bg-white p-6 rounded-2xl border border-purple-100 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-purple-300 transition-all duration-200 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-800 flex items-center justify-center group-hover:bg-purple-800 group-hover:text-white transition-colors duration-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-purple-950 group-hover:text-purple-700 transition-colors">Gestión de Citas</h3>
+                                <p class="text-xs text-gray-500 mt-1">Fichas disponibles, reservas, reprogramaciones, cancelaciones y asistencia.</p>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-purple-50 flex items-center justify-between text-xs font-semibold text-purple-700 group-hover:text-purple-900">
+                            <span>Acceder al módulo</span>
+                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </a>
+                @endif
+
+                {{-- Módulo de Oferta Médica (CU07, CU08, CU09) --}}
+                @if (Auth::user()->tienePermiso('especialidad.gestionar') || Auth::user()->tienePermiso('medico.gestionar') || Auth::user()->tienePermiso('horario.gestionar'))
+                    @php
+                        $rutaOferta = Auth::user()->tienePermiso('especialidad.gestionar')
+                            ? route('especialidades.index')
+                            : (Auth::user()->tienePermiso('medico.gestionar') ? route('medicos.index') : route('horarios.index'));
+                    @endphp
+                    <a href="{{ $rutaOferta }}" class="group bg-white p-6 rounded-2xl border border-purple-100 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-purple-300 transition-all duration-200 flex flex-col justify-between">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-800 flex items-center justify-center group-hover:bg-purple-800 group-hover:text-white transition-colors duration-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-purple-950 group-hover:text-purple-700 transition-colors">Oferta Médica</h3>
+                                <p class="text-xs text-gray-500 mt-1">Especialidades, médicos, matrículas y grilla semanal de horarios con capacidad.</p>
+                            </div>
+                        </div>
+                        <div class="mt-5 pt-3 border-t border-purple-50 flex items-center justify-between text-xs font-semibold text-purple-700 group-hover:text-purple-900">
+                            <span>Acceder al módulo</span>
+                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </a>
+                @endif
+
                 {{-- Módulo de Usuarios (CU02) --}}
                 @if (Auth::user()->tienePermiso('usuario.gestionar'))
                     <a href="{{ route('usuarios.index') }}" class="group bg-white p-6 rounded-2xl border border-purple-100 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-purple-300 transition-all duration-200 flex flex-col justify-between">

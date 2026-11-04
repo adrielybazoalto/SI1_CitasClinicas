@@ -15,6 +15,12 @@ class Rol extends Model
     /** Nombre del rol protegido: nunca pierde la gestión de roles (CU03). */
     const ADMINISTRADOR = 'Administrador';
 
+    /** Rol asignado automáticamente a la cuenta del paciente (CU05). */
+    const PACIENTE = 'Paciente';
+
+    /** Rol del personal médico (CU08). */
+    const MEDICO = 'Medico';
+
     protected $table = 'rol';
     protected $primaryKey = 'id_rol';
     public $timestamps = false;

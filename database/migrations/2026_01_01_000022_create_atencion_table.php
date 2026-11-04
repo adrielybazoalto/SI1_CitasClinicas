@@ -22,9 +22,11 @@ return new class extends Migration
             $table->timestamp('registrado_en')->useCurrent();
             $table->foreign('id_cita')->references('id_cita')->on('cita')->onDelete('restrict');
         });
-        DB::statement('ALTER TABLE atencion ADD CONSTRAINT chk_atencion_peso CHECK (peso_kg BETWEEN 0.5 AND 400)');
-        DB::statement('ALTER TABLE atencion ADD CONSTRAINT chk_atencion_talla CHECK (talla_cm BETWEEN 20 AND 250)');
-        DB::statement('ALTER TABLE atencion ADD CONSTRAINT chk_atencion_temperatura CHECK (temperatura_c BETWEEN 30 AND 45)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE atencion ADD CONSTRAINT chk_atencion_peso CHECK (peso_kg BETWEEN 0.5 AND 400)');
+            DB::statement('ALTER TABLE atencion ADD CONSTRAINT chk_atencion_talla CHECK (talla_cm BETWEEN 20 AND 250)');
+            DB::statement('ALTER TABLE atencion ADD CONSTRAINT chk_atencion_temperatura CHECK (temperatura_c BETWEEN 30 AND 45)');
+        }
     }
 
     public function down(): void

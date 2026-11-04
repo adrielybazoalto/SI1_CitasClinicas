@@ -7,11 +7,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement('CREATE EXTENSION IF NOT EXISTS btree_gist;');
+        // btree_gist solo existe en PostgreSQL; SQLite no la necesita.
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('CREATE EXTENSION IF NOT EXISTS btree_gist;');
+        }
     }
 
     public function down(): void
     {
-        DB::statement('DROP EXTENSION IF EXISTS btree_gist;');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('DROP EXTENSION IF EXISTS btree_gist;');
+        }
     }
 };

@@ -22,9 +22,11 @@ return new class extends Migration
             $table->string('estado', 7)->default('ABIERTA');
             $table->foreign('id_usuario')->references('id_usuario')->on('usuario')->onDelete('restrict');
         });
-        DB::statement('ALTER TABLE caja ADD CONSTRAINT chk_caja_monto_inicial CHECK (monto_inicial >= 0)');
-        DB::statement("ALTER TABLE caja ADD CONSTRAINT chk_caja_estado CHECK (estado IN ('ABIERTA','CERRADA'))");
-        DB::statement('ALTER TABLE caja ADD CONSTRAINT chk_caja_cierre CHECK (cierre IS NULL OR cierre >= apertura)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE caja ADD CONSTRAINT chk_caja_monto_inicial CHECK (monto_inicial >= 0)');
+            DB::statement("ALTER TABLE caja ADD CONSTRAINT chk_caja_estado CHECK (estado IN ('ABIERTA','CERRADA'))");
+            DB::statement('ALTER TABLE caja ADD CONSTRAINT chk_caja_cierre CHECK (cierre IS NULL OR cierre >= apertura)');
+        }
         DB::statement("CREATE UNIQUE INDEX ux_caja_abierta ON caja (id_usuario) WHERE estado = 'ABIERTA'");
     }
 
