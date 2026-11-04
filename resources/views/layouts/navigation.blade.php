@@ -63,6 +63,17 @@
                         </x-nav-link>
                     @endif
 
+                    @if (Auth::user()->tienePermiso('agenda.consultar'))
+                        <x-nav-link :href="route('agenda.index')" :active="request()->routeIs('agenda.*', 'atencion.*')">
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-4 h-4 {{ request()->routeIs('agenda.*', 'atencion.*') ? 'text-purple-700' : 'text-gray-400 group-hover:text-purple-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                </svg>
+                                Agenda
+                            </span>
+                        </x-nav-link>
+                    @endif
+
                     {{-- Menú según permisos del rol (CU03) --}}
                     @if (Auth::user()->tienePermiso('usuario.gestionar'))
                         <x-nav-link :href="route('usuarios.index')" :active="request()->routeIs('usuarios.*')">
@@ -194,6 +205,17 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                         Citas
+                    </span>
+                </x-responsive-nav-link>
+            @endif
+
+            @if (Auth::user()->tienePermiso('agenda.consultar'))
+                <x-responsive-nav-link :href="route('agenda.index')" :active="request()->routeIs('agenda.*', 'atencion.*')">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 {{ request()->routeIs('agenda.*', 'atencion.*') ? 'text-purple-700' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                        Agenda
                     </span>
                 </x-responsive-nav-link>
             @endif

@@ -211,14 +211,14 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 **Archivos:** `Controllers/Atencion/{Agenda,Atencion,Historial}Controller.php`, `Services/AtencionService.php` y `views/atencion/`.
 
 #### CU20 Consultar agenda médica
-- [ ] Ruta `GET /atencion/agenda` con `permiso:agenda.consultar`.
-- [ ] El **médico** ve directamente su agenda del día (usuario → `medico.id_usuario`) y no puede ver la de otro médico. El administrador y la recepcionista eligen médico y fecha.
-- [ ] La lista va ordenada por hora, con: hora, código, paciente, especialidad, estado y motivo breve.
-- [ ] Filtro por estado (pendientes, confirmadas, atendidas, canceladas e inasistencias).
-- [ ] **Vista semanal:** los 7 días, con la cantidad de citas por estado.
-- [ ] En las citas **Confirmada**, botón "Atender" que lleva a CU21. Solo aparece si el usuario tiene `atencion.registrar`.
-- [ ] El motivo se oculta a la recepcionista (excepción de CU20). Lo ven el médico y el administrador.
-- [ ] Prueba mínima 8: "Buscar citas de un médico por fecha".
+- [x] Ruta `GET /atencion/agenda` con `permiso:agenda.consultar`.
+- [x] El **médico** ve directamente su agenda del día (usuario → `medico.id_usuario`) y no puede ver la de otro médico. El administrador y la recepcionista eligen médico y fecha.
+- [x] La lista va ordenada por hora, con: hora, código, paciente, especialidad, estado y motivo breve.
+- [x] Filtro por estado (pendientes, confirmadas, atendidas, canceladas e inasistencias).
+- [x] **Vista semanal:** los 7 días, con la cantidad de citas por estado.
+- [x] En las citas **Confirmada**, botón "Atender" (se activa solo cuando exista la ruta `atencion.create` de CU21) que lleva a CU21. Solo aparece si el usuario tiene `atencion.registrar`.
+- [x] El motivo se oculta a la recepcionista (excepción de CU20). Lo ven el médico y el administrador.
+- [x] Prueba mínima 8: "Buscar citas de un médico por fecha".
 
 #### CU21 Registrar atención médica (incluye CU22; CU06 lo extiende)
 - [ ] `AtencionService::registrar(Cita $cita, array $datos, User $usuario)` dentro de `DB::transaction`:

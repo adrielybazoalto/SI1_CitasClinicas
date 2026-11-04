@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Atencion\AgendaController;
 use App\Http\Controllers\Citas\AsistenciaController;
 use App\Http\Controllers\Citas\CitaController;
 use App\Http\Controllers\Citas\FichaController;
@@ -150,7 +151,12 @@ Route::middleware('auth')->group(function () {
             Route::patch('/inasistencia', 'inasistencia')->name('inasistencia');
         });
 
-    // Atención (CU20, CU21, CU22)
+    // Atención · CU20 Consultar agenda médica
+    Route::get('/atencion/agenda', [AgendaController::class, 'index'])
+        ->middleware('permiso:agenda.consultar')
+        ->name('agenda.index');
+
+    // Atención (CU21, CU22)
     // Reportes (CU23)
     // Caja (CU18, CU19 ciclo 2)
 });
