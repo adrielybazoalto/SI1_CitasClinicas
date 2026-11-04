@@ -165,6 +165,8 @@ Debe existir lo siguiente. Lo que falte se agrega con **una migración nueva** q
 
 Crea `database/seeders/DatosDemoSeeder.php` y regístralo en `DatabaseSeeder` después de `SeguridadSeeder`.
 
+> **Decisión de la usuaria (04/11):** los datos maestros salen de `02_poblacion.sql` (23 usuarios con clave `<username>@2026`, 13 pacientes, 6 médicos, especialidades con Odontología, 13 horarios, tarifas). Solo las citas se generan relativas a hoy. Prevalece sobre la tabla de abajo.
+
 Requisitos del seeder:
 
 - **Idempotente:** se identifica cada registro por su código, CI o username (`firstOrCreate`). Ejecutarlo dos veces no duplica nada ni borra nada.
@@ -185,8 +187,8 @@ Requisitos del seeder:
 | `historial_estado_cita` | Cada transición de cada cita (Programada → Confirmada → Atendida, etc.) |
 | `indisponibilidad` | 1 periodo futuro de un médico (para probar CU10) |
 
-- [ ] Ejecuta solo `php artisan db:seed --class=DatosDemoSeeder`. **Nunca** `migrate:fresh --seed`.
-- [ ] Verifica con `php artisan db:show --counts`.
+- [x] Ejecuta solo `php artisan db:seed --class=DatosDemoSeeder`. **Nunca** `migrate:fresh --seed`.
+- [x] Verifica con `php artisan db:show --counts`.
 - [ ] Actualiza `Contrasenas_de_prueba.md` con la tabla de usuarios de demostración (usuario, rol y clave `Clinica2026`).
 - [ ] Opcional, para la documentación: exporta los datos a `database/sql/02_poblacion.sql` con `pg_dump --data-only --inserts`.
 
@@ -194,7 +196,7 @@ Requisitos del seeder:
 
 Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tiene commits locales en `amalia`.
 
-- [ ] Ejecuta `git fetch origin` y muestra `git log --oneline origin/main..origin/adriely` y `git log --oneline origin/main..amalia`.
+- [x] Ejecuta `git fetch origin` y muestra `git log --oneline origin/main..origin/adriely` y `git log --oneline origin/main..amalia`.
 - [ ] Propón el orden del merge (primero `adriely` → `main`, luego `amalia` → `main`), resuelve los conflictos y **pide confirmación antes de cada push**.
 - [ ] Después del merge, en `main`: `composer install`, `npm install`, `npm run build`, `composer test`. Todo debe pasar.
 - [ ] A partir de aquí, trabaja en una rama por paquete (`p5-atencion`, `p6-reportes`…) y súbela a `main` con un Pull Request.

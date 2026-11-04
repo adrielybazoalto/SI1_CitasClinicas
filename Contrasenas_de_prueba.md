@@ -4,7 +4,7 @@ Regla: **contraseña = username + `@2026`**. Se puede entrar con el username o c
 
 | # | Rol | Username | Correo | Contraseña | Nota |
 |---|---|---|---|---|---|
-| 1 | Administrador | admin | admin@vidasalud.bo | `admin@2026` |  |
+| 1 | Administrador | admin | admin@vidasalud.bo | *(la que se definió al cambiarla el 04/11)* | Creado por `SeguridadSeeder`; `DatosDemoSeeder` no lo modifica |
 | 2 | Recepcionista | rmendoza | rosa.mendoza@vidasalud.bo | `rmendoza@2026` |  |
 | 3 | Recepcionista | jcuellar | jorge.cuellar@vidasalud.bo | `jcuellar@2026` | Debe cambiarla al entrar (debe_cambiar_clave = TRUE) |
 | 4 | Recepcionista | lsuarez | lucia.suarez@vidasalud.bo | `lsuarez@2026` |  |

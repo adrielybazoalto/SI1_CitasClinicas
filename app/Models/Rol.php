@@ -21,6 +21,9 @@ class Rol extends Model
     /** Rol del personal médico (CU08). */
     const MEDICO = 'Medico';
 
+    /** Rol del personal de recepción. */
+    const RECEPCIONISTA = 'Recepcionista';
+
     protected $table = 'rol';
     protected $primaryKey = 'id_rol';
     public $timestamps = false;
