@@ -42,6 +42,14 @@
             <x-aviso-modulo />
             @include('citas._alertas')
 
+            {{-- RNF20 · CU12/CU13: dictado de especialidad, médico, fecha y motivo (nunca envía la reserva) --}}
+            <x-voz :campos="array_filter([
+                'especialidad' => $reprogramando ? null : 'sel_especialidad',
+                'medico' => 'sel_medico',
+                'fecha' => 'sel_fecha',
+                'motivo' => $puedeReservar && ! $reprogramando ? 'motivo' : null,
+            ])" />
+
             @if ($reprogramando)
                 <div class="p-4 bg-purple-50 border border-purple-200 text-purple-900 rounded-xl text-sm">
                     Cita actual: <strong>{{ $cita->fecha->format('d/m/Y') }} a las {{ $cita->hora_inicio_corta }}</strong>

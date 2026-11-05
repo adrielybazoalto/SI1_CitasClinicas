@@ -80,7 +80,7 @@ Un paquete **nunca** llama a otro que esté por encima de él en esta lista. Las
 | P3 | CU07, CU08, CU09 | 1 | ✅ Hecho |
 | P3 | CU10, CU11 | 2 | ✅ Hechos (04/11) · CU10: falta decidir Confirmada → Cancelada |
 | P4 | CU12, CU13, CU15, CU16, CU17 | 1 | ✅ Hecho en la rama `adriely` (falta llevarlo a `main`) |
-| P4 | CU14 + voz | 2 | ✅ CU14 hecho (04/11) · ⬜ voz |
+| P4 | CU14 + voz | 2 | ✅ Hechos (04/11) |
 | P5 | CU20, CU21, CU22 | 1 | ✅ Hecho en `amalia` (04/11) |
 | P6 | CU23 | 1 | ✅ Hecho en `amalia` (04/11) |
 | P6 | CU18, CU19 | 2 | ✅ Hechos (04/11) |
@@ -314,11 +314,11 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 - [x] **Temporizador:** en `routes/console.php`, agrega una tarea cada minuto que cancele las citas con pago vencido, usando `CitaEstadoService` con el motivo "pago vencido".
 
 ### P4 · Comandos de voz (RNF20, RF42–RF44)
-- [ ] `resources/js/voz.js` con Web Speech API (`lang = 'es-ES'`), en las pantallas de CU12, CU13 y CU20.
-- [ ] Botón de micrófono con indicador de "escuchando" y el texto reconocido en pantalla.
-- [ ] Navegación ("abrir agenda", "nueva cita", "citas disponibles"): solo hacia las rutas permitidas para el rol. El servidor pasa la lista a la vista.
-- [ ] Dictado de especialidad, médico, fecha y motivo: llena los campos y **nunca** envía el formulario solo. La usuaria confirma visualmente.
-- [ ] Si el navegador no tiene soporte o no se entiende el comando, se muestra un mensaje y se sigue con teclado y ratón.
+- [x] `resources/js/voz.js` con Web Speech API (`lang = 'es-ES'`), en las pantallas de CU12, CU13 y CU20.
+- [x] Botón de micrófono con indicador de "escuchando" y el texto reconocido en pantalla.
+- [x] Navegación ("abrir agenda", "nueva cita", "citas disponibles"): solo hacia las rutas permitidas para el rol. El servidor pasa la lista a la vista.
+- [x] Dictado de especialidad, médico, fecha y motivo: llena los campos y **nunca** envía el formulario solo. La usuaria confirma visualmente.
+- [x] Si el navegador no tiene soporte o no se entiende el comando, se muestra un mensaje y se sigue con teclado y ratón.
 
 ---
 

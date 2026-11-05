@@ -40,6 +40,9 @@
     <div class="py-6 sm:py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
             <x-aviso-modulo />
+
+            {{-- RNF20 · CU20: dictado de médico, fecha y estado (no envía el filtro solo) --}}
+            <x-voz :campos="array_filter(['medico' => $esMedico ? null : 'medico', 'fecha' => 'fecha', 'estado' => 'estado'])" />
             @include('citas._alertas')
 
             @if ($errors->any())
