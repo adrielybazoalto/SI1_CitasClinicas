@@ -7,8 +7,12 @@ use App\Models\Cita;
 use App\Models\Comprobante;
 use App\Models\Pago;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 /**
  * P4 · Pagos de citas (entidades Pago y Comprobante).
@@ -50,7 +54,7 @@ class PagoService
      *
      * @throws ValidationException
      */
-    public function cobrar(Cita $cita, string $metodo, ?int $idCaja, ?string $idTransaccion, ?User $actor): Pago
+    public function cobrar(Cita $cita, string $metodo, ?int $idCaja, ?string $idTransaccion, ?User $actor, string $accion = Bitacora::COBRAR_CITA): Pago
     {
         $cita = Cita::query()->lockForUpdate()->findOrFail($cita->id_cita);
 
@@ -80,7 +84,7 @@ class PagoService
         $comprobante = Comprobante::create(['id_pago' => $pago->id_pago, 'numero' => $this->siguienteNumero()]);
 
         $this->bitacora->registrar(
-            Bitacora::COBRAR_CITA,
+            $accion,
             'pago',
             $pago->id_pago,
             sprintf('Cita %s · %s · Bs %s · comprobante N.º %d', $cita->codigo, $metodo, number_format((float) $cita->monto, 2, ',', '.'), $comprobante->numero),
@@ -88,6 +92,59 @@ class PagoService
         );
 
         return $pago->setRelation('comprobante', $comprobante)->setRelation('cita', $cita);
+    }
+
+    /* ------------------------------------------------------------------
+     | CU14 · Pagar cita en línea
+     * ------------------------------------------------------------------ */
+
+    /** ¿Venció la retención de 15 minutos para pagar en línea (RN20)? */
+    public function vencida(Cita $cita): bool
+    {
+        return $cita->vence_pago_en !== null && $cita->vence_pago_en->isPast();
+    }
+
+    /**
+     * Confirma un pago en línea (PayPal capturado o QR verificado):
+     * pago APROBADO con id de transacción, cita Pagada y comprobante.
+     *
+     * @throws ValidationException
+     */
+    public function pagarEnLinea(Cita $cita, string $metodo, string $idTransaccion, User $actor): Pago
+    {
+        return DB::transaction(function () use ($cita, $metodo, $idTransaccion, $actor) {
+            if ($this->vencida($cita->fresh())) {
+                throw ValidationException::withMessages(['cita' => 'El tiempo para pagar esta cita en línea ya venció.']);
+            }
+
+            return $this->cobrar($cita, $metodo, null, $idTransaccion, $actor, Bitacora::PAGO_EN_LINEA);
+        });
+    }
+
+    /** Envía el comprobante en PDF al correo del paciente. Devuelve false si no se pudo. */
+    public function enviarComprobante(Pago $pago): bool
+    {
+        $pago->load(['comprobante', 'cita.paciente', 'cita.medico', 'cita.especialidad', 'registrador']);
+        $correo = $pago->cita?->paciente?->correo;
+
+        if (! $correo || ! $pago->comprobante) {
+            return false;
+        }
+
+        try {
+            $pdf = Pdf::loadView('pdf.comprobante', ['pago' => $pago])->setPaper('a5', 'portrait')->output();
+            Mail::raw(
+                "Adjuntamos el comprobante N.º {$pago->comprobante->numero} de su cita {$pago->cita->codigo}.\n\nClínica Vida Salud",
+                fn ($m) => $m->to($correo)->subject('Vida Salud · Comprobante de pago')
+                    ->attachData($pdf, "comprobante-{$pago->comprobante->numero}.pdf", ['mime' => 'application/pdf']),
+            );
+        } catch (Throwable $e) {
+            Log::error('No se pudo enviar el comprobante', ['pago' => $pago->id_pago, 'error' => $e->getMessage()]);
+
+            return false;
+        }
+
+        return true;
     }
 
     /**

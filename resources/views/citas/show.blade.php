@@ -88,6 +88,14 @@
                         </a>
                     @endif
 
+                    @if (app(\App\Services\PagoService::class)->cobrable($cita) && $usuario->tienePermiso('pago.en_linea') && ! app(\App\Services\PagoService::class)->vencida($cita))
+                        {{-- CU14: el paciente paga su cita en línea --}}
+                        <a href="{{ route('pagos.show', $cita) }}"
+                           class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-semibold text-xs text-white uppercase tracking-wider transition-colors">
+                            Pagar en línea · Bs {{ number_format((float) $cita->monto, 2, ',', '.') }}
+                        </a>
+                    @endif
+
                     @if ($programada && $usuario->tienePermiso('cita.reprogramar'))
                         <a href="{{ route('citas.reprogramar', $cita) }}"
                            class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-purple-800 hover:bg-purple-900 rounded-xl font-semibold text-xs text-white uppercase tracking-wider transition-colors">

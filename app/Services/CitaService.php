@@ -213,7 +213,11 @@ class CitaService
                 'estado' => CitaEstadoService::PROGRAMADA,
                 'estado_pago' => 'Pendiente',
                 // RN22: la cita guarda el precio vigente al reservar; un cambio posterior de tarifa no la afecta.
-                'monto' => $this->tarifas->vigenteEn($idEspecialidad, CarbonImmutable::today())?->monto,
+                'monto' => $monto = $this->tarifas->vigenteEn($idEspecialidad, CarbonImmutable::today())?->monto,
+                // RN20: la reserva en línea se retiene unos minutos mientras el paciente paga (CU14).
+                'vence_pago_en' => $canal === DisponibilidadService::CANAL_LINEA && (float) $monto > 0
+                    ? CarbonImmutable::now()->addMinutes((int) config('clinica.retencion_pago_min', 15))
+                    : null,
                 'veces_reprogramada' => 0,
             ]);
 
@@ -403,6 +407,43 @@ class CitaService
 
             return $cita;
         });
+    }
+
+    /**
+     * Temporizador (RN20) · cancela las reservas en línea que no se pagaron
+     * a tiempo. La ficha se libera porque las canceladas no ocupan horario.
+     * Devuelve cuántas citas canceló.
+     */
+    public function cancelarPagosVencidos(): int
+    {
+        $vencidas = Cita::query()
+            ->where('estado', CitaEstadoService::PROGRAMADA)
+            ->where('estado_pago', 'Pendiente')
+            ->whereNotNull('vence_pago_en')
+            ->where('vence_pago_en', '<', CarbonImmutable::now())
+            ->pluck('id_cita');
+
+        $canceladas = 0;
+        foreach ($vencidas as $idCita) {
+            DB::transaction(function () use ($idCita, &$canceladas) {
+                $cita = Cita::query()->lockForUpdate()->find($idCita);
+
+                // Pudo pagarse justo antes de bloquearla.
+                if (! $cita || $cita->estado !== CitaEstadoService::PROGRAMADA || $cita->estado_pago !== 'Pendiente') {
+                    return;
+                }
+
+                $this->estados->transicionar($cita, CitaEstadoService::CANCELADA, 'Pago vencido', null, [
+                    'motivo_cancelacion' => 'Pago vencido',
+                ]);
+                $this->notificaciones->avisar($cita, NotificacionService::CANCELACION);
+                $this->bitacora->registrar(Bitacora::CANCELACION_PAGO_VENCIDO, 'cita', $cita->id_cita,
+                    "Cita {$cita->codigo} cancelada: no se pagó en línea a tiempo", null);
+                $canceladas++;
+            });
+        }
+
+        return $canceladas;
     }
 
     /**

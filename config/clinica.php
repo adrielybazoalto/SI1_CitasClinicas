@@ -25,6 +25,9 @@ return [
     // RN20 · Retención para pago en línea (ciclo 2), en minutos
     'retencion_pago_min' => 15,
 
+    // CU14 · PayPal no acepta bolivianos: se cobra el equivalente en USD con este tipo de cambio (Bs por 1 USD).
+    'paypal_tipo_cambio' => 6.96,
+
     // RN23 · Recordatorio por correo, horas antes de la cita
     'recordatorio_horas_antes' => 24,
 

@@ -11,11 +11,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
-use Throwable;
 
 /**
  * CU19 · Cobrar cita en mostrador y emitir comprobante.
@@ -91,25 +88,15 @@ class CobroController extends Controller
     /** Envía el comprobante en PDF al correo del paciente. */
     public function enviar(Pago $pago): RedirectResponse
     {
-        $pago->load(['comprobante', 'cita.paciente']);
         $correo = $pago->cita?->paciente?->correo;
 
         if (! $correo) {
             return back()->with('error', 'El paciente no tiene correo registrado.');
         }
 
-        try {
-            $pdf = $this->pdf($pago)->output();
-            Mail::raw("Adjuntamos el comprobante N.º {$pago->comprobante->numero} de su cita {$pago->cita->codigo}.\n\nClínica Vida Salud",
-                fn ($m) => $m->to($correo)->subject('Vida Salud · Comprobante de pago')
-                    ->attachData($pdf, "comprobante-{$pago->comprobante->numero}.pdf", ['mime' => 'application/pdf']));
-        } catch (Throwable $e) {
-            Log::error('No se pudo enviar el comprobante', ['pago' => $pago->id_pago, 'error' => $e->getMessage()]);
-
-            return back()->with('error', 'No se pudo enviar el correo. Intente más tarde.');
-        }
-
-        return back()->with('status', "Comprobante enviado a {$correo}.");
+        return $this->pagos->enviarComprobante($pago)
+            ? back()->with('status', "Comprobante enviado a {$correo}.")
+            : back()->with('error', 'No se pudo enviar el correo. Intente más tarde.');
     }
 
     private function pdf(Pago $pago)

@@ -8,6 +8,7 @@ use App\Http\Controllers\Caja\CobroController;
 use App\Http\Controllers\Citas\AsistenciaController;
 use App\Http\Controllers\Citas\CitaController;
 use App\Http\Controllers\Citas\FichaController;
+use App\Http\Controllers\Citas\PagoController;
 use App\Http\Controllers\Citas\ReubicacionController;
 use App\Http\Controllers\Oferta\EspecialidadController;
 use App\Http\Controllers\Oferta\HorarioController;
@@ -185,6 +186,19 @@ Route::middleware('auth')->group(function () {
             Route::get('/{cita}/reprogramar', 'editReprogramar')->middleware('permiso:cita.reprogramar')->name('reprogramar');
             Route::put('/{cita}/reprogramar', 'reprogramar')->middleware('permiso:cita.reprogramar')->name('reprogramar.update');
             Route::patch('/{cita}/cancelar', 'cancelar')->middleware('permiso:cita.cancelar')->name('cancelar');
+        });
+
+    // Citas · CU14 Pagar cita en línea (PayPal Sandbox o QR simulado)
+    Route::prefix('pagos')->name('pagos.')
+        ->middleware('permiso:pago.en_linea')
+        ->controller(PagoController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/{cita}', 'show')->name('show');
+            Route::post('/{cita}/paypal', 'paypal')->name('paypal');
+            Route::get('/{cita}/paypal/retorno', 'paypalRetorno')->name('paypal.retorno');
+            Route::get('/{cita}/paypal/cancelado', 'paypalCancelado')->name('paypal.cancelado');
+            Route::post('/{cita}/qr', 'qr')->name('qr');
+            Route::get('/{cita}/comprobante', 'comprobante')->name('comprobante');
         });
 
     // Citas · CU17 Registrar asistencia e inasistencia

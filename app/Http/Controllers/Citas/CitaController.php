@@ -68,8 +68,15 @@ class CitaController extends Controller
             return back()->withInput()->with('error', $e->getMessage());
         }
 
-        return redirect()->route('citas.show', $cita)
-            ->with('status', "Cita {$cita->codigo} programada: ficha {$cita->nro_cita}, {$cita->fecha->format('d/m/Y')} a las {$cita->hora_inicio_corta}.");
+        $mensaje = "Cita {$cita->codigo} programada: {$cita->fecha->format('d/m/Y')} a las {$cita->hora_inicio_corta}.";
+
+        // CU14 extiende a CU13: la reserva en línea pasa directo al pago (RN20).
+        if ($cita->vence_pago_en && $request->user()->tienePermiso('pago.en_linea')) {
+            return redirect()->route('pagos.show', $cita)
+                ->with('status', $mensaje.' Págela antes de las '.$cita->vence_pago_en->format('H:i').' o la reserva se liberará.');
+        }
+
+        return redirect()->route('citas.show', $cita)->with('status', $mensaje);
     }
 
     /** Detalle de la cita con su historial de estados. */

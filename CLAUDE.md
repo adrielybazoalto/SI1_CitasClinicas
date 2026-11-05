@@ -80,7 +80,7 @@ Un paquete **nunca** llama a otro que esté por encima de él en esta lista. Las
 | P3 | CU07, CU08, CU09 | 1 | ✅ Hecho |
 | P3 | CU10, CU11 | 2 | ✅ Hechos (04/11) · CU10: falta decidir Confirmada → Cancelada |
 | P4 | CU12, CU13, CU15, CU16, CU17 | 1 | ✅ Hecho en la rama `adriely` (falta llevarlo a `main`) |
-| P4 | CU14 + voz | 2 | ⬜ Vacíos (`PagoController`, `PayPalService`) |
+| P4 | CU14 + voz | 2 | ✅ CU14 hecho (04/11) · ⬜ voz |
 | P5 | CU20, CU21, CU22 | 1 | ✅ Hecho en `amalia` (04/11) |
 | P6 | CU23 | 1 | ✅ Hecho en `amalia` (04/11) |
 | P6 | CU18, CU19 | 2 | ✅ Hechos (04/11) |
@@ -307,11 +307,11 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 - [x] Bloque "Mis próximas citas" con enlaces para reprogramar y cancelar.
 
 ### P4 · CU14 Pagar cita en línea (PayPal o QR) — extiende a CU13
-- [ ] En una reserva por el canal LINEA: `estado_pago = Pendiente` y `vence_pago_en = creado_en + 15 min` (RN20). La pantalla muestra un contador regresivo.
-- [ ] **PayPal Sandbox:** `PayPalService` con la API REST v2 (crear la orden y **capturarla al volver** en `/pago/retorno`). Las credenciales van en `.env` (`PAYPAL_CLIENT_ID`, `PAYPAL_SECRET`, `PAYPAL_MODE=sandbox`). Webhook opcional con verificación de firma (RNF16).
-- [ ] **QR:** genera un QR con el código de la cita y el monto, y deja un botón "Verificar pago" que simule la confirmación del banco. En la pantalla debe decir claramente que es una simulación de sandbox.
-- [ ] Cuando se confirma el pago: `pago` (PAYPAL o QR, `id_transaccion`, APROBADO) → `estado_pago = Pagado` → `comprobante` → correo al paciente.
-- [ ] **Temporizador:** en `routes/console.php`, agrega una tarea cada minuto que cancele las citas con pago vencido, usando `CitaEstadoService` con el motivo "pago vencido".
+- [x] En una reserva por el canal LINEA: `estado_pago = Pendiente` y `vence_pago_en = creado_en + 15 min` (RN20). La pantalla muestra un contador regresivo.
+- [x] **PayPal Sandbox:** `PayPalService` con la API REST v2 (crear la orden y **capturarla al volver** en `/pago/retorno`). Las credenciales van en `.env` (`PAYPAL_CLIENT_ID`, `PAYPAL_SECRET`, `PAYPAL_MODE=sandbox`). Webhook opcional con verificación de firma (RNF16) **no implementado** (el pago se confirma al capturar la orden). Monto en USD con `clinica.paypal_tipo_cambio`.
+- [x] **QR:** genera un QR con el código de la cita y el monto, y deja un botón "Verificar pago" que simule la confirmación del banco. En la pantalla debe decir claramente que es una simulación de sandbox.
+- [x] Cuando se confirma el pago: `pago` (PAYPAL o QR, `id_transaccion`, APROBADO) → `estado_pago = Pagado` → `comprobante` → correo al paciente.
+- [x] **Temporizador:** en `routes/console.php`, agrega una tarea cada minuto que cancele las citas con pago vencido, usando `CitaEstadoService` con el motivo "pago vencido".
 
 ### P4 · Comandos de voz (RNF20, RF42–RF44)
 - [ ] `resources/js/voz.js` con Web Speech API (`lang = 'es-ES'`), en las pantallas de CU12, CU13 y CU20.

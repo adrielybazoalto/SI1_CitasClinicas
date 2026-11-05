@@ -28,3 +28,9 @@ Schedule::call(fn () => app(NotificacionService::class)->enviarPendientes())
     ->name('notificaciones:enviar')
     ->everyMinute()
     ->withoutOverlapping();
+
+// CU14 · RN20: cancela las reservas en línea con el pago vencido.
+Schedule::call(fn () => app(CitaService::class)->cancelarPagosVencidos())
+    ->name('citas:pagos-vencidos')
+    ->everyMinute()
+    ->withoutOverlapping();
