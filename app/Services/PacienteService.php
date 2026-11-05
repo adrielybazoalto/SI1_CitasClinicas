@@ -192,6 +192,51 @@ class PacienteService
     }
 
     /**
+     * CU04 · El paciente actualiza sus datos de contacto, el contacto de
+     * emergencia y la preferencia de recordatorios. CI, nombres y
+     * antecedentes clínicos son de solo lectura (los cambia la recepción).
+     * $datos ya viene validado por PerfilRequest.
+     */
+    public function actualizarPerfil(Paciente $paciente, array $datos, User $actor): Paciente
+    {
+        return DB::transaction(function () use ($paciente, $datos, $actor) {
+            $correo = ($datos['correo'] ?? null) ?: null;
+
+            $paciente->fill([
+                'telefono' => $datos['telefono'],
+                'correo' => $correo,
+                'direccion' => ($datos['direccion'] ?? null) ?: null,
+                'recibe_recordatorios' => (bool) ($datos['recibe_recordatorios'] ?? false),
+            ])->save();
+
+            // La cuenta usa el mismo correo (o uno interno si lo deja vacío).
+            $paciente->usuario?->fill([
+                'correo' => $correo ?? $this->correoPlaceholder($paciente->usuario->username, $paciente->usuario->id_usuario),
+            ])->save();
+
+            // Contacto de emergencia: solo esos campos; el resto de los antecedentes no se toca.
+            $antecedente = Antecedente::firstOrNew(['id_paciente' => $paciente->id_paciente]);
+            foreach (['contacto_nombre', 'contacto_parentesco', 'contacto_telefono'] as $campo) {
+                $antecedente->{$campo} = ($datos[$campo] ?? null) ? trim($datos[$campo]) : null;
+            }
+            if ($antecedente->exists || $antecedente->isDirty()) {
+                $antecedente->actualizado_por = $actor->id_usuario;
+                $antecedente->save();
+            }
+
+            $this->bitacora->registrar(
+                Bitacora::ACTUALIZAR_PERFIL,
+                'paciente',
+                $paciente->id_paciente,
+                "El paciente {$paciente->codigo} actualizó su perfil",
+                $actor->id_usuario,
+            );
+
+            return $paciente->refresh();
+        });
+    }
+
+    /**
      * CU06 · Crea o actualiza los antecedentes clínicos del paciente.
      */
     public function actualizarAntecedentes(Paciente $paciente, array $datos, User $actor): ?Antecedente

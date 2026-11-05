@@ -16,6 +16,7 @@ use App\Http\Controllers\Oferta\MedicoController;
 use App\Http\Controllers\Oferta\TarifaController;
 use App\Http\Controllers\Pacientes\AntecedenteController;
 use App\Http\Controllers\Pacientes\PacienteController;
+use App\Http\Controllers\Pacientes\PerfilController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Reportes\ReporteController;
 use App\Http\Controllers\Seguridad\BitacoraController;
@@ -92,6 +93,12 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{paciente}', 'destroy')->name('destroy');
             Route::patch('/{paciente}/activar', 'activar')->name('activar');
         });
+
+    // Pacientes · CU04 Gestionar perfil del paciente (solo el propio)
+    Route::middleware('permiso:perfil.gestionar')->group(function () {
+        Route::get('/mi-perfil', [PerfilController::class, 'edit'])->name('perfil.edit');
+        Route::put('/mi-perfil', [PerfilController::class, 'update'])->name('perfil.update');
+    });
 
     // Pacientes · CU06 Gestionar antecedentes clínicos
     Route::get('/pacientes/{paciente}/antecedentes', [AntecedenteController::class, 'edit'])

@@ -76,7 +76,7 @@ Un paquete **nunca** llama a otro que esté por encima de él en esta lista. Las
 |---|---|:-:|---|
 | P1 | CU01, CU02, CU03 | 1 | ✅ Hecho · ✅ consulta de bitácora (`amalia`) |
 | P2 | CU05, CU06 | 1 | ✅ Hecho |
-| P2 | CU04 | 2 | ⬜ Vacío (`PerfilController`) |
+| P2 | CU04 | 2 | ✅ Hecho (04/11) |
 | P3 | CU07, CU08, CU09 | 1 | ✅ Hecho |
 | P3 | CU10, CU11 | 2 | ✅ Hechos (04/11) · CU10: falta decidir Confirmada → Cancelada |
 | P4 | CU12, CU13, CU15, CU16, CU17 | 1 | ✅ Hecho en la rama `adriely` (falta llevarlo a `main`) |
@@ -300,11 +300,11 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 - [x] CU08: al desactivar un médico que tiene citas futuras, se ofrece ir a CU10.
 
 ### P2 · CU04 Gestionar perfil del paciente
-- [ ] "Mi perfil" con `permiso:perfil.gestionar`: el paciente solo accede a su propio registro.
-- [ ] Puede editar teléfono, correo, dirección y contacto de emergencia. El CI, los nombres y los antecedentes son **de solo lectura** (con un mensaje que indique acudir a recepción).
-- [ ] Cambio de contraseña: verifica la actual y pide la nueva dos veces (mínimo 8 caracteres).
-- [ ] Preferencia `recibe_recordatorios` (activar o desactivar).
-- [ ] Bloque "Mis próximas citas" con enlaces para reprogramar y cancelar.
+- [x] "Mi perfil" con `permiso:perfil.gestionar`: el paciente solo accede a su propio registro.
+- [x] Puede editar teléfono, correo, dirección y contacto de emergencia. El CI, los nombres y los antecedentes son **de solo lectura** (con un mensaje que indique acudir a recepción).
+- [x] Cambio de contraseña: verifica la actual y pide la nueva dos veces (mínimo 8 caracteres).
+- [x] Preferencia `recibe_recordatorios` (activar o desactivar).
+- [x] Bloque "Mis próximas citas" con enlaces para reprogramar y cancelar.
 
 ### P4 · CU14 Pagar cita en línea (PayPal o QR) — extiende a CU13
 - [ ] En una reserva por el canal LINEA: `estado_pago = Pendiente` y `vence_pago_en = creado_en + 15 min` (RN20). La pantalla muestra un contador regresivo.
