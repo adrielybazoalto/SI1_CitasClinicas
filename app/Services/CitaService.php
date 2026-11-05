@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Bitacora;
 use App\Exceptions\FichaNoDisponibleException;
 use App\Models\Cita;
 use App\Models\Especialidad;
@@ -220,7 +221,7 @@ class CitaService
             $this->notificaciones->programarRecordatorio($cita);
 
             $this->bitacora->registrar(
-                'CITA_PROGRAMADA',
+                Bitacora::PROGRAMAR_CITA,
                 'cita',
                 $cita->id_cita,
                 sprintf('Cita %s · paciente %d · médico %d · %s %s · ficha %d', $cita->codigo, $idPaciente, $idMedico, $fecha, substr($ficha['hora_inicio'], 0, 5), $cita->nro_cita),
@@ -297,7 +298,7 @@ class CitaService
             $this->notificaciones->programarRecordatorio($cita);
             $this->notificaciones->avisar($cita, NotificacionService::REPROGRAMACION);
 
-            $this->bitacora->registrar('CITA_REPROGRAMADA', 'cita', $cita->id_cita, "Cita {$cita->codigo} · {$detalle}", $actor->id_usuario);
+            $this->bitacora->registrar(Bitacora::REPROGRAMAR_CITA, 'cita', $cita->id_cita, "Cita {$cita->codigo} · {$detalle}", $actor->id_usuario);
 
             return $cita->load(['paciente', 'medico', 'especialidad']);
         });
@@ -340,7 +341,7 @@ class CitaService
 
             $this->notificaciones->avisar($cita, NotificacionService::CANCELACION);
 
-            $this->bitacora->registrar('CITA_CANCELADA', 'cita', $cita->id_cita, "Cita {$cita->codigo} cancelada: {$motivo}", $actor->id_usuario);
+            $this->bitacora->registrar(Bitacora::CANCELAR_CITA, 'cita', $cita->id_cita, "Cita {$cita->codigo} cancelada: {$motivo}", $actor->id_usuario);
 
             return $cita;
         });
@@ -381,7 +382,7 @@ class CitaService
                 'hora_llegada' => $ahora,
             ]);
 
-            $this->bitacora->registrar('CITA_CONFIRMADA', 'cita', $cita->id_cita, "Cita {$cita->codigo} · {$detalle}", $actor->id_usuario);
+            $this->bitacora->registrar(Bitacora::REGISTRAR_LLEGADA, 'cita', $cita->id_cita, "Cita {$cita->codigo} · {$detalle}", $actor->id_usuario);
 
             return $cita;
         });
@@ -406,7 +407,7 @@ class CitaService
 
             $this->estados->transicionar($cita, CitaEstadoService::INASISTENCIA, $detalle, $actor->id_usuario);
 
-            $this->bitacora->registrar('CITA_INASISTENCIA', 'cita', $cita->id_cita, "Cita {$cita->codigo} · {$detalle}", $actor->id_usuario);
+            $this->bitacora->registrar(Bitacora::REGISTRAR_INASISTENCIA, 'cita', $cita->id_cita, "Cita {$cita->codigo} · {$detalle}", $actor->id_usuario);
 
             return $cita;
         });
@@ -442,7 +443,7 @@ class CitaService
                     }
 
                     $this->estados->transicionar($cita, CitaEstadoService::INASISTENCIA, 'Inasistencia automática (temporizador)', null);
-                    $this->bitacora->registrar('CITA_INASISTENCIA_AUTO', 'cita', $cita->id_cita, "Cita {$cita->codigo} sin llegada");
+                    $this->bitacora->registrar(Bitacora::INASISTENCIA_AUTOMATICA, 'cita', $cita->id_cita, "Cita {$cita->codigo} sin llegada");
                 });
                 $marcadas++;
             } catch (Throwable $e) {

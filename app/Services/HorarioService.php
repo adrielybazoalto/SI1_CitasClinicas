@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Bitacora;
 use App\Models\Especialidad;
 use App\Models\Horario;
 use App\Models\Medico;
@@ -170,7 +171,7 @@ class HorarioService
             $calculo = $this->capacidad($horario->hora_inicio, $horario->hora_fin, $horario->duracion_min);
 
             $this->bitacora->registrar(
-                'HORARIO_CREADO',
+                Bitacora::REGISTRAR_HORARIO,
                 'horario',
                 $horario->id_horario,
                 sprintf(
@@ -223,7 +224,7 @@ class HorarioService
             $calculo = $this->capacidad($horario->hora_inicio, $horario->hora_fin, $horario->duracion_min);
 
             $this->bitacora->registrar(
-                'HORARIO_MODIFICADO',
+                Bitacora::MODIFICAR_HORARIO,
                 'horario',
                 $horario->id_horario,
                 sprintf(
@@ -261,7 +262,7 @@ class HorarioService
             $horario->forceFill(['estado' => $estado])->save();
 
             $this->bitacora->registrar(
-                $estado ? 'HORARIO_ACTIVADO' : 'HORARIO_DESACTIVADO',
+                $estado ? Bitacora::ACTIVAR_HORARIO : Bitacora::DESACTIVAR_HORARIO,
                 'horario',
                 $horario->id_horario,
                 $estado ? 'Horario activado' : 'Horario desactivado (baja lógica)',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Reportes;
 
+use App\Models\Bitacora;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Reportes\GenerarReporteRequest;
 use App\Services\BitacoraService;
@@ -48,7 +49,7 @@ class ReporteController extends Controller
         $reporte = $this->servicio->generar($filtros);
         $archivo = 'reporte-'.Str::slug($filtros['tipo']).'-'.now()->format('Ymd-His');
 
-        $this->bitacora->registrar('REPORTE_EXPORTADO', null, null, strtoupper($formato).' · '.$reporte['titulo'].' · '.$reporte['subtitulo']);
+        $this->bitacora->registrar(Bitacora::EXPORTAR_REPORTE, null, null, strtoupper($formato).' · '.$reporte['titulo'].' · '.$reporte['subtitulo']);
 
         if ($formato === 'pdf') {
             return Pdf::loadView('pdf.reporte', ['reporte' => $reporte, 'emitido' => now(), 'usuario' => $request->user()])

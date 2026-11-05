@@ -24,16 +24,17 @@ class BitacoraController extends Controller
         $filtros = $request->validate([
             'desde' => ['nullable', 'date_format:Y-m-d'],
             'hasta' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:desde'],
-            'usuario' => ['nullable', 'string', 'max:50'],
+            'usuario' => ['nullable', 'integer'],
             'accion' => ['nullable', 'string', 'max:50'],
-            'tabla' => ['nullable', 'string', 'max:50'],
+            'ip' => ['nullable', 'string', 'max:45', 'regex:/^[0-9a-fA-F.:]+$/'],
         ], [
             'hasta.after_or_equal' => 'La fecha final no puede ser anterior a la inicial.',
+            'ip.regex' => 'La dirección IP solo puede tener números, puntos o dos puntos.',
         ]);
 
         return view('seguridad.bitacora', array_merge($this->servicio->catalogos(), [
             'registros' => $this->servicio->listar($filtros),
-            'filtros' => $filtros + ['desde' => null, 'hasta' => null, 'usuario' => null, 'accion' => null, 'tabla' => null],
+            'filtros' => $filtros + ['desde' => null, 'hasta' => null, 'usuario' => null, 'accion' => null, 'ip' => null],
         ]));
     }
 }

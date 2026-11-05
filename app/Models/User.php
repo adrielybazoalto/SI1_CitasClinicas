@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -89,5 +90,32 @@ class User extends Authenticatable
         }
 
         return in_array($codigo, $this->codigosPermiso, true);
+    }
+
+    /** Ficha de médico vinculada a la cuenta (si la tiene). */
+    public function medico(): HasOne
+    {
+        return $this->hasOne(Medico::class, 'id_usuario', 'id_usuario');
+    }
+
+    /** Ficha de paciente vinculada a la cuenta (si la tiene). */
+    public function paciente(): HasOne
+    {
+        return $this->hasOne(Paciente::class, 'id_usuario', 'id_usuario');
+    }
+
+    /**
+     * Nombre para mostrar en la interfaz: nombres y apellidos del médico o
+     * del paciente; para el personal sin ficha, su username.
+     */
+    public function nombreParaMostrar(): string
+    {
+        $persona = match ($this->rol?->nombre) {
+            Rol::MEDICO => $this->medico,
+            Rol::PACIENTE => $this->paciente,
+            default => null,
+        };
+
+        return $persona ? trim($persona->nombres.' '.$persona->apellidos) : $this->username;
     }
 }

@@ -13,8 +13,9 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h2 class="font-bold text-2xl text-purple-950 leading-tight">Reportes</h2>
-                <p class="text-xs text-purple-800/70 mt-0.5">Seleccione el reporte y los filtros; la exportación respeta los filtros aplicados</p>
+                <x-encabezado-modulo />
+                <h2 class="text-3xl font-bold text-gray-900 leading-tight">Reportes</h2>
+                <p class="text-sm text-gray-500 mt-0.5">Seleccione el reporte y los filtros; la exportación respeta los filtros aplicados</p>
             </div>
             @unless ($reporte['vacio'])
                 <div class="flex gap-2">

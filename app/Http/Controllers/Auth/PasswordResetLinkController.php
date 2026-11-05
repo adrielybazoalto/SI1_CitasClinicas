@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\Bitacora;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\BitacoraService;
@@ -68,7 +69,7 @@ class PasswordResetLinkController extends Controller
                 Log::error('No se pudo enviar el correo de recuperación', ['error' => $e->getMessage()]);
             }
 
-            $this->bitacora->registrar('RECUPERACION_SOLICITADA', 'usuario', $usuario->id_usuario, 'Enlace de recuperación enviado', $usuario->id_usuario);
+            $this->bitacora->registrar(Bitacora::SOLICITUD_RECUPERACION_CLAVE, 'usuario', $usuario->id_usuario, 'Enlace de recuperación enviado', $usuario->id_usuario);
         }
 
         return back()->with('status', 'Si el correo está registrado, recibirá un enlace para restablecer su contraseña.');

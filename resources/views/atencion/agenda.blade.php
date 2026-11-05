@@ -17,8 +17,9 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h2 class="font-bold text-2xl text-purple-950 leading-tight">{{ $esMedico ? 'Mi agenda' : 'Agenda médica' }}</h2>
-                <p class="text-xs text-purple-800/70 mt-0.5">
+                <x-encabezado-modulo />
+                <h2 class="text-3xl font-bold text-gray-900 leading-tight">{{ $esMedico ? 'Mi agenda' : 'Agenda médica' }}</h2>
+                <p class="text-sm text-gray-500 mt-0.5">
                     @if ($medico)
                         {{ $medico->nombre_completo }} ·
                     @endif

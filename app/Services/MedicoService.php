@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Bitacora;
 use App\Models\Especialidad;
 use App\Models\Horario;
 use App\Models\Medico;
@@ -130,7 +131,7 @@ class MedicoService
             $this->sincronizarEspecialidades($medico, $datos['especialidades']);
 
             $this->bitacora->registrar(
-                'MEDICO_CREADO',
+                Bitacora::REGISTRAR_MEDICO,
                 'medico',
                 $medico->id_medico,
                 "Médico {$medico->codigo} · matrícula {$medico->matricula} · {$medico->nombre_completo}",
@@ -162,7 +163,7 @@ class MedicoService
             $this->sincronizarEspecialidades($medico, $datos['especialidades']);
 
             $this->bitacora->registrar(
-                'MEDICO_MODIFICADO',
+                Bitacora::MODIFICAR_MEDICO,
                 'medico',
                 $medico->id_medico,
                 $cambios ? 'Campos modificados: '.implode(', ', $cambios) : 'Datos del médico actualizados',
@@ -180,7 +181,7 @@ class MedicoService
             $medico->forceFill(['estado' => $estado])->save();
 
             $this->bitacora->registrar(
-                $estado ? 'MEDICO_ACTIVADO' : 'MEDICO_DESACTIVADO',
+                $estado ? Bitacora::ACTIVAR_MEDICO : Bitacora::DESACTIVAR_MEDICO,
                 'medico',
                 $medico->id_medico,
                 $estado ? 'Médico activado' : 'Médico desactivado (baja lógica; conserva historial)',

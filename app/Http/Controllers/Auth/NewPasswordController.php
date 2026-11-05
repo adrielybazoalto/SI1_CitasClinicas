@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\Bitacora;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\BitacoraService;
@@ -71,7 +72,7 @@ class NewPasswordController extends Controller
             return $registro->id_usuario;
         });
 
-        $this->bitacora->registrar('CLAVE_RECUPERADA', 'usuario', $idUsuario, 'Contraseña restablecida por enlace de recuperación', $idUsuario);
+        $this->bitacora->registrar(Bitacora::RECUPERACION_CLAVE, 'usuario', $idUsuario, 'Contraseña restablecida por enlace de recuperación', $idUsuario);
 
         return redirect()->route('login')->with('status', 'Su contraseña fue restablecida. Ya puede iniciar sesión.');
     }

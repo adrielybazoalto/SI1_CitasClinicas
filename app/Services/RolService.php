@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Bitacora;
 use App\Models\Permiso;
 use App\Models\Rol;
 use Illuminate\Support\Collection;
@@ -31,7 +32,7 @@ class RolService
             'estado' => true,
         ]);
 
-        $this->bitacora->registrar('ROL_CREADO', 'rol', $rol->id_rol, "Rol {$rol->nombre}");
+        $this->bitacora->registrar(Bitacora::CREAR_ROL, 'rol', $rol->id_rol, "Rol {$rol->nombre}");
 
         return $rol;
     }
@@ -77,7 +78,7 @@ class RolService
         $agregados = array_diff($despues, $antes);
         $quitados = array_diff($antes, $despues);
 
-        $this->bitacora->registrar('PERMISOS_ACTUALIZADOS', 'rol_permiso', $rol->id_rol, sprintf(
+        $this->bitacora->registrar(Bitacora::MODIFICAR_PERMISOS_ROL, 'rol_permiso', $rol->id_rol, sprintf(
             'Rol %s. Agregados: %s. Quitados: %s.',
             $rol->nombre,
             $agregados ? implode(', ', $agregados) : 'ninguno',

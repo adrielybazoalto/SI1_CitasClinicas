@@ -138,7 +138,7 @@ class ReporteTest extends TestCase
         $this->assertStringStartsWith("\xEF\xBB\xBF", $contenido);
         $this->assertStringContainsString('Citas por especialidad', $contenido);
         $this->assertStringContainsString('Odontología', $contenido);
-        $this->assertDatabaseHas('bitacora', ['accion' => 'REPORTE_EXPORTADO']);
+        $this->assertDatabaseHas('bitacora', ['accion' => 'EXPORTAR_REPORTE']);
     }
 
     public function test_exporta_pdf(): void
@@ -177,10 +177,10 @@ class ReporteTest extends TestCase
     public function test_el_administrador_consulta_la_bitacora_con_filtros(): void
     {
         $this->actingAs($this->admin())
-            ->get(route('bitacora.index', ['accion' => 'CITA_PROGRAMADA']))
+            ->get(route('bitacora.index', ['accion' => 'PROGRAMAR_CITA']))
             ->assertOk()
-            ->assertSee('CITA_PROGRAMADA')
-            ->assertDontSee('REPORTE_EXPORTADO');
+            ->assertSee('PROGRAMAR_CITA')
+            ->assertDontSee('EXPORTAR_REPORTE');
     }
 
     public function test_la_recepcionista_no_ve_la_bitacora(): void

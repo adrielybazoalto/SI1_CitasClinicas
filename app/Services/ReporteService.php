@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Bitacora;
 use App\Models\Especialidad;
 use App\Models\Medico;
 use App\Models\User;
@@ -199,7 +200,10 @@ class ReporteService
 
         $columnas = ['fecha_hora' => 'Fecha y hora', 'usuario' => 'Usuario', 'accion' => 'Acción', 'tabla' => 'Tabla', 'ip' => 'IP', 'detalle' => 'Detalle'];
 
-        return $this->sinGrupos($filas->map(fn ($r) => (array) $r)->all(), $columnas, conteo: 'registros');
+        // Los registros antiguos (LOGIN, LOGOUT…) se muestran con el nombre en español.
+        $filas = $filas->map(fn ($r) => ['accion' => Bitacora::accionLegible($r->accion)] + (array) $r);
+
+        return $this->sinGrupos($filas->all(), $columnas, conteo: 'registros');
     }
 
     /** Solo administrador · cobros − reembolsos aprobados, por día y método. */

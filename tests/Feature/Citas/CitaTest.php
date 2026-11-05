@@ -256,7 +256,7 @@ class CitaTest extends TestCase
         $this->assertSame(4, $cita->nro_cita);
 
         $this->assertDatabaseHas('historial_estado_cita', ['id_cita' => $cita->id_cita, 'estado_anterior' => null, 'estado_nuevo' => 'Programada']);
-        $this->assertDatabaseHas('bitacora', ['accion' => 'CITA_PROGRAMADA', 'id_registro' => $cita->id_cita]);
+        $this->assertDatabaseHas('bitacora', ['accion' => 'PROGRAMAR_CITA', 'id_registro' => $cita->id_cita]);
 
         // Recordatorio a −24 h (RN23).
         $recordatorio = Notificacion::where('id_cita', $cita->id_cita)->where('tipo', 'RECORDATORIO')->firstOrFail();

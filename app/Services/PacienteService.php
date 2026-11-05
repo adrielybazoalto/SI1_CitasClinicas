@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Bitacora;
 use App\Models\Antecedente;
 use App\Models\Paciente;
 use App\Models\Rol;
@@ -104,7 +105,7 @@ class PacienteService
             $this->guardarAntecedentes($paciente, $datos, $actor);
 
             $this->bitacora->registrar(
-                'PACIENTE_CREADO',
+                Bitacora::REGISTRAR_PACIENTE,
                 'paciente',
                 $paciente->id_paciente,
                 "Paciente {$paciente->codigo} · CI {$paciente->ci} · cuenta {$usuario->username}",
@@ -152,7 +153,7 @@ class PacienteService
             $this->guardarAntecedentes($paciente, $datos, $actor);
 
             $this->bitacora->registrar(
-                'PACIENTE_MODIFICADO',
+                Bitacora::MODIFICAR_PACIENTE,
                 'paciente',
                 $paciente->id_paciente,
                 "Paciente {$paciente->codigo} actualizado",
@@ -179,7 +180,7 @@ class PacienteService
             }
 
             $this->bitacora->registrar(
-                $estado ? 'PACIENTE_ACTIVADO' : 'PACIENTE_DESACTIVADO',
+                $estado ? Bitacora::ACTIVAR_PACIENTE : Bitacora::DESACTIVAR_PACIENTE,
                 'paciente',
                 $paciente->id_paciente,
                 $estado ? 'Paciente activado' : 'Paciente desactivado (baja lógica)',
@@ -199,7 +200,7 @@ class PacienteService
             $antecedente = $this->guardarAntecedentes($paciente, $datos, $actor);
 
             $this->bitacora->registrar(
-                'ANTECEDENTE_ACTUALIZADO',
+                Bitacora::ACTUALIZAR_ANTECEDENTES,
                 'antecedente',
                 $paciente->id_paciente,
                 "Antecedentes del paciente {$paciente->codigo}",

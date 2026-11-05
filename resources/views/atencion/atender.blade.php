@@ -15,8 +15,9 @@
                 </svg>
             </a>
             <div>
-                <h2 class="font-bold text-2xl text-purple-950 leading-tight">Registrar atención</h2>
-                <p class="text-xs text-purple-800/70">
+                <x-encabezado-modulo />
+                <h2 class="text-3xl font-bold text-gray-900 leading-tight">Registrar atención</h2>
+                <p class="text-sm text-gray-500">
                     Cita {{ $cita->codigo }} · {{ $cita->fecha->format('d/m/Y') }} {{ $cita->hora_inicio_corta }} · {{ ucfirst($cita->especialidad?->nombre) }}
                 </p>
             </div>

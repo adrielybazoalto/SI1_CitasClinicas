@@ -15,10 +15,11 @@
                 </svg>
             </a>
             <div>
-                <h2 class="font-bold text-2xl text-purple-950 leading-tight">
+                <x-encabezado-modulo />
+                <h2 class="text-3xl font-bold text-gray-900 leading-tight">
                     {{ $esAlta ? 'Nuevo turno' : 'Editar turno' }}
                 </h2>
-                <p class="text-xs text-purple-800/70">
+                <p class="text-sm text-gray-500">
                     {{ $esAlta ? 'Defina el día, la franja horaria y la duración de la consulta' : 'Ajuste la franja o la duración del turno' }}
                 </p>
             </div>

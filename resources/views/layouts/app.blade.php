@@ -9,7 +9,7 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -24,28 +24,28 @@
              class="fixed inset-0 z-30 bg-purple-950/40 lg:hidden" style="display: none"></div>
 
         <div class="lg:pl-72 min-h-screen flex flex-col">
-            {{-- Barra superior: botón de menú (celular), título de la página y usuario --}}
-            <header class="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-purple-100">
-                <div class="flex items-center gap-3 min-h-16 px-4 sm:px-6 lg:px-8 py-3">
-                    <button type="button" @click="menu = true" class="lg:hidden p-2 -ml-2 rounded-lg text-purple-800 hover:bg-purple-50" aria-label="Abrir menú">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            {{-- Celular: barra mínima con ☰ y el logo (en escritorio no hay barra superior) --}}
+            <header class="lg:hidden sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-purple-100">
+                <div class="flex items-center gap-3 h-14 px-4">
+                    <button type="button" @click="menu = true" class="p-2 -ml-2 rounded-lg text-purple-800 hover:bg-purple-50" aria-label="Abrir menú">
+                        <x-icono nombre="menu" class="w-6 h-6" />
                     </button>
-
-                    <div class="flex-1 min-w-0">
-                        @isset($header)
-                            {{ $header }}
-                        @endisset
-                    </div>
-
-                    @include('layouts.partials.menu-usuario')
+                    <a href="{{ route('dashboard') }}" class="min-w-0"><x-application-logo size="sm" :showText="true" /></a>
                 </div>
             </header>
 
-            <main class="flex-1 py-2">
+            {{-- Encabezado de la página (cada vista lo define en su slot header) --}}
+            @isset($header)
+                <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+                    {{ $header }}
+                </div>
+            @endisset
+
+            <main class="flex-1">
                 {{ $slot }}
             </main>
 
-            <footer class="py-5 text-center text-xs text-purple-900/60 border-t border-purple-100/60 bg-white/40">
+            <footer class="py-5 text-center text-xs text-gray-500 border-t border-purple-100/60 bg-white/40">
                 &copy; 2026 Vida Salud. Todos los derechos reservados.
             </footer>
         </div>

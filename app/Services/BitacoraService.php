@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Bitacora;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -43,32 +45,42 @@ class BitacoraService
     }
 
     /**
-     * Consulta paginada de la bitácora, más reciente primero.
+     * Consulta paginada de la bitácora, más reciente primero (20 por página).
+     * El filtro de acción usa el nombre en español e incluye los registros
+     * antiguos guardados con el nombre en inglés.
      *
-     * @param array{desde?: ?string, hasta?: ?string, usuario?: ?string, accion?: ?string, tabla?: ?string} $filtros
+     * @param array{desde?: ?string, hasta?: ?string, usuario?: ?int, accion?: ?string, ip?: ?string} $filtros
      */
     public function listar(array $filtros): LengthAwarePaginator
     {
         return Bitacora::query()
-            ->with('usuario:id_usuario,username')
+            ->with(['usuario:id_usuario,username,id_rol', 'usuario.rol:id_rol,nombre'])
             ->when(filled($filtros['desde'] ?? null), fn ($q) => $q->where('fecha_hora', '>=', $filtros['desde'].' 00:00:00'))
             ->when(filled($filtros['hasta'] ?? null), fn ($q) => $q->where('fecha_hora', '<=', $filtros['hasta'].' 23:59:59'))
-            ->when(filled($filtros['usuario'] ?? null), fn ($q) => $q->whereHas('usuario',
-                fn ($u) => $u->whereRaw('lower(username) like ?', ['%'.mb_strtolower(trim($filtros['usuario'])).'%'])))
-            ->when(filled($filtros['accion'] ?? null), fn ($q) => $q->where('accion', $filtros['accion']))
-            ->when(filled($filtros['tabla'] ?? null), fn ($q) => $q->where('tabla', $filtros['tabla']))
+            ->when(filled($filtros['usuario'] ?? null), fn ($q) => $q->where('id_usuario', $filtros['usuario']))
+            ->when(filled($filtros['accion'] ?? null), fn ($q) => $q->whereIn('accion', Bitacora::nombresDe($filtros['accion'])))
+            ->when(filled($filtros['ip'] ?? null), fn ($q) => $q->where('ip', 'like', trim($filtros['ip']).'%'))
             ->orderByDesc('fecha_hora')
             ->orderByDesc('id_bitacora')
-            ->paginate(25)
+            ->paginate(20)
             ->withQueryString();
     }
 
-    /** Valores distintos de acción y tabla para los filtros. @return array{acciones: array<string>, tablas: array<string>} */
+    /**
+     * Opciones de los filtros: usuarios (por nombre, no por ID) y las
+     * acciones en español que existen en la bitácora.
+     *
+     * @return array{usuarios: Collection<int, User>, acciones: array<string>}
+     */
     public function catalogos(): array
     {
+        $acciones = DB::table('bitacora')->distinct()->pluck('accion')
+            ->map(fn ($accion) => Bitacora::accionLegible($accion))
+            ->unique()->sort()->values()->all();
+
         return [
-            'acciones' => DB::table('bitacora')->distinct()->orderBy('accion')->pluck('accion')->all(),
-            'tablas' => DB::table('bitacora')->whereNotNull('tabla')->distinct()->orderBy('tabla')->pluck('tabla')->all(),
+            'usuarios' => User::query()->with('rol:id_rol,nombre')->orderBy('username')->get(['id_usuario', 'username', 'id_rol']),
+            'acciones' => $acciones,
         ];
     }
 }

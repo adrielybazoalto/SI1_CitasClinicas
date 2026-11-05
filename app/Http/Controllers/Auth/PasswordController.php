@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\Bitacora;
 use App\Http\Controllers\Controller;
 use App\Services\BitacoraService;
 use Illuminate\Http\RedirectResponse;
@@ -75,6 +76,6 @@ class PasswordController extends Controller
             'debe_cambiar_clave' => false,
         ])->save();
 
-        $this->bitacora->registrar('CLAVE_CAMBIADA', 'usuario', $usuario->id_usuario, 'El usuario cambió su contraseña');
+        $this->bitacora->registrar(Bitacora::CAMBIO_CLAVE, 'usuario', $usuario->id_usuario, 'El usuario cambió su contraseña');
     }
 }

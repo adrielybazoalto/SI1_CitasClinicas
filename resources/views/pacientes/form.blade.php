@@ -9,10 +9,11 @@
                 </svg>
             </a>
             <div>
-                <h2 class="font-bold text-2xl text-purple-950 leading-tight">
+                <x-encabezado-modulo />
+                <h2 class="text-3xl font-bold text-gray-900 leading-tight">
                     {{ $esAlta ? 'Nuevo paciente' : 'Editar paciente: '.$paciente->codigo }}
                 </h2>
-                <p class="text-xs text-purple-800/70">
+                <p class="text-sm text-gray-500">
                     {{ $esAlta ? 'Registre los datos personales y se creará su cuenta de acceso' : 'Actualice los datos personales y clínicos del paciente' }}
                 </p>
             </div>

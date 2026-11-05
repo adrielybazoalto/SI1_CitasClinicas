@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bitacora;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Services\BitacoraService;
 use Illuminate\Http\RedirectResponse;
@@ -41,7 +42,7 @@ class ProfileController extends Controller
         $usuario->save();
 
         if ($cambios) {
-            $this->bitacora->registrar('USUARIO_MODIFICADO', 'usuario', $usuario->id_usuario,
+            $this->bitacora->registrar(Bitacora::MODIFICAR_USUARIO, 'usuario', $usuario->id_usuario,
                 'Perfil propio. Campos modificados: '.implode(', ', $cambios));
         }
 

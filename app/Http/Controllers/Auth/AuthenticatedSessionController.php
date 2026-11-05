@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\Bitacora;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Services\BitacoraService;
@@ -46,11 +47,11 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Cierra la sesión: registra LOGOUT y destruye la sesión del servidor.
+     * Cierra la sesión: registra CIERRE_SESION y destruye la sesión del servidor.
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $this->bitacora->registrar('LOGOUT', 'usuario', Auth::id(), 'Cierre de sesión');
+        $this->bitacora->registrar(Bitacora::CIERRE_SESION, 'usuario', Auth::id(), 'Cierre de sesión de '.Auth::user()?->username);
 
         Auth::guard('web')->logout();
 

@@ -150,7 +150,7 @@ class AtencionTest extends TestCase
         $this->assertDatabaseHas('historial_estado_cita', [
             'id_cita' => $this->confirmada->id_cita, 'estado_anterior' => 'Confirmada', 'estado_nuevo' => 'Atendida',
         ]);
-        $this->assertDatabaseHas('bitacora', ['accion' => 'ATENCION_REGISTRADA', 'id_usuario' => $this->usuarioPerez->id_usuario]);
+        $this->assertDatabaseHas('bitacora', ['accion' => 'REGISTRAR_ATENCION', 'id_usuario' => $this->usuarioPerez->id_usuario]);
     }
 
     public function test_el_diagnostico_es_obligatorio_y_se_validan_los_signos_vitales(): void

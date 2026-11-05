@@ -13,11 +13,12 @@
                 </svg>
             </a>
             <div>
-                <h2 class="font-bold text-2xl text-purple-950 leading-tight flex items-center gap-3">
+                <x-encabezado-modulo />
+                <h2 class="text-3xl font-bold text-gray-900 leading-tight flex items-center gap-3">
                     Cita <span class="font-mono">{{ $cita->codigo }}</span>
                     @include('citas._estado', ['estado' => $cita->estado])
                 </h2>
-                <p class="text-xs text-purple-800/70">Registrada el {{ $cita->creado_en?->format('d/m/Y H:i') }} por {{ $cita->creador?->username ?? '—' }}</p>
+                <p class="text-sm text-gray-500">Registrada el {{ $cita->creado_en?->format('d/m/Y H:i') }} por {{ $cita->creador?->username ?? '—' }}</p>
             </div>
         </div>
     </x-slot>

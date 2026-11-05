@@ -21,10 +21,11 @@
                 </svg>
             </a>
             <div>
-                <h2 class="font-bold text-2xl text-purple-950 leading-tight">
+                <x-encabezado-modulo />
+                <h2 class="text-3xl font-bold text-gray-900 leading-tight">
                     {{ $reprogramando ? "Reprogramar cita {$cita->codigo}" : ($puedeReservar ? 'Reservar ficha' : 'Fichas disponibles') }}
                 </h2>
-                <p class="text-xs text-purple-800/70">
+                <p class="text-sm text-gray-500">
                     @if ($reprogramando)
                         Elija la nueva ficha de {{ $cita->especialidad?->nombre }} · se conserva el código de la cita
                     @else

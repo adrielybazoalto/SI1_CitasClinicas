@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Bitacora;
 use App\Models\Especialidad;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -63,7 +64,7 @@ class EspecialidadService
             ]);
 
             $this->bitacora->registrar(
-                'ESPECIALIDAD_CREADA',
+                Bitacora::REGISTRAR_ESPECIALIDAD,
                 'especialidad',
                 $especialidad->id_especialidad,
                 "Especialidad {$especialidad->nombre} · {$especialidad->duracion_min} min",
@@ -89,7 +90,7 @@ class EspecialidadService
 
             if ($cambios) {
                 $this->bitacora->registrar(
-                    'ESPECIALIDAD_MODIFICADA',
+                    Bitacora::MODIFICAR_ESPECIALIDAD,
                     'especialidad',
                     $especialidad->id_especialidad,
                     'Campos modificados: '.implode(', ', $cambios),
@@ -108,7 +109,7 @@ class EspecialidadService
             $especialidad->forceFill(['estado' => $estado])->save();
 
             $this->bitacora->registrar(
-                $estado ? 'ESPECIALIDAD_ACTIVADA' : 'ESPECIALIDAD_DESACTIVADA',
+                $estado ? Bitacora::ACTIVAR_ESPECIALIDAD : Bitacora::DESACTIVAR_ESPECIALIDAD,
                 'especialidad',
                 $especialidad->id_especialidad,
                 $estado ? 'Especialidad activada' : 'Especialidad desactivada (baja lógica)',

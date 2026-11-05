@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Bitacora;
 use App\Models\Atencion;
 use App\Models\Cita;
 use App\Models\Medico;
@@ -276,7 +277,7 @@ class AtencionService
             $this->estados->transicionar($cita, CitaEstadoService::ATENDIDA, 'Atención registrada por el médico', $usuario->id_usuario);
 
             $this->bitacora->registrar(
-                'ATENCION_REGISTRADA',
+                Bitacora::REGISTRAR_ATENCION,
                 'atencion',
                 $atencion->id_atencion,
                 sprintf('Cita %s · paciente %d · diagnóstico: %s', $cita->codigo, $cita->id_paciente, mb_substr($datos['diagnostico'], 0, 120)),

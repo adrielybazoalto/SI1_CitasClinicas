@@ -41,12 +41,14 @@ class MenuLateralTest extends TestCase
 
     public function test_el_paciente_no_ve_seguridad_ni_oferta_medica(): void
     {
+        // (La etiqueta "P1 · Seguridad y Accesos • CU01" del inicio sí aparece: es el CU01 de iniciar sesión.)
         $this->actingAs($this->usuario('p6543210'))->get(route('dashboard'))
             ->assertOk()
-            ->assertDontSee('Seguridad y Accesos')
+            ->assertSee('Hola, María López Ribera')
+            ->assertDontSee('Usuarios (CU02)')
             ->assertDontSee('Oferta Médica')
             ->assertSee('Gestión de Citas')
-            ->assertSee('Historial del paciente');
+            ->assertSee('Historial del paciente (CU22)');
     }
 
     public function test_el_medico_ve_atencion_y_no_reportes(): void

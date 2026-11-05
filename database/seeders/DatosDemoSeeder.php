@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Bitacora;
 use App\Models\Rol;
 use App\Services\DisponibilidadService;
 use App\Services\HorarioService;
@@ -658,7 +659,7 @@ class DatosDemoSeeder extends Seeder
         DB::table('bitacora')->insert([
             'id_usuario' => $creador, 'fecha_hora' => $creado->toDateTimeString(),
             'ip' => $canal === 'LINEA' ? '190.181.6.'.mt_rand(10, 99) : '192.168.1.'.mt_rand(20, 29),
-            'accion' => 'CITA_PROGRAMADA', 'tabla' => 'cita', 'id_registro' => $idCita,
+            'accion' => Bitacora::PROGRAMAR_CITA, 'tabla' => 'cita', 'id_registro' => $idCita,
             'detalle' => sprintf('Cita CM-%06d · %s %s · ficha %d', $numero, $inicio->toDateString(), $inicio->format('H:i'), $ficha['nro']),
         ]);
     }

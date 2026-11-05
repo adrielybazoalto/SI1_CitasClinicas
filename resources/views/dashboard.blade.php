@@ -1,213 +1,54 @@
+{{-- Panel de inicio: saludo y tarjetas de los módulos del rol, agrupadas por paquete --}}
+@php
+    $usuario = Auth::user();
+    $paquetes = \App\Support\MenuModulos::paraUsuario($usuario);
+    $rol = $usuario->rol?->nombre === 'Medico' ? 'Médico' : ($usuario->rol?->nombre ?? 'Usuario');
+@endphp
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-            <div>
-                <h2 class="font-bold text-2xl text-purple-950 leading-tight">Panel Principal</h2>
-                <p class="text-xs text-purple-800/70">Resumen y acceso a los módulos del sistema de gestión clínica</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-900 border border-purple-200">
-                    <span class="w-2 h-2 rounded-full bg-purple-700 animate-pulse"></span>
-                    Sistema en línea
-                </span>
-            </div>
+        <x-encabezado-modulo paquete="P1" titulo-paquete="Seguridad y Accesos" cu="CU01" />
+        <div class="flex flex-wrap items-center gap-3">
+            <h2 class="text-3xl font-bold text-gray-900 leading-tight">Hola, {{ $usuario->nombreParaMostrar() }}</h2>
+            <span class="px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-semibold uppercase tracking-wide">{{ $rol }}</span>
         </div>
+        <p class="mt-1 text-sm text-gray-500">Bienvenido a Vida Salud. Accede a los módulos disponibles para tu rol.</p>
     </x-slot>
 
     <div class="py-6 sm:py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-
-            <!-- Banner de Bienvenida Vida Salud con Gradiente Púrpura Corporativo -->
-            <div class="relative overflow-hidden bg-gradient-to-r from-purple-950 via-purple-900 to-purple-950 text-white rounded-3xl p-6 sm:p-10 shadow-xl shadow-purple-950/15 border border-purple-800/40">
-                <!-- Efectos de luz ambiental -->
-                <div class="absolute -right-16 -top-16 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute right-1/3 -bottom-20 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                    <div class="space-y-3 max-w-2xl">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-xs font-medium text-purple-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
-                            Portal Clínico Vida Salud
-                        </div>
-                        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                            ¡Bienvenido(a), {{ Auth::user()->username }}!
-                        </h1>
-                        <p class="text-sm text-purple-200/90 leading-relaxed">
-                            Sistema integral para la programación y reserva de citas médicas, administración de turnos y control de acceso.
-                        </p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            @foreach ($paquetes as $paquete)
+                <section>
+                    <h3 class="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{{ $paquete['paquete'] }} · {{ $paquete['titulo'] }}</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @foreach ($paquete['visibles'] as $item)
+                            <article class="flex flex-col bg-white rounded-2xl shadow-sm border border-purple-100 p-5 {{ $item['disponible'] ? '' : 'opacity-60' }}">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-11 h-11 shrink-0 rounded-xl bg-purple-50 text-purple-800 flex items-center justify-center">
+                                        <x-icono :nombre="$item['icono']" class="w-6 h-6" />
+                                    </span>
+                                    <div class="min-w-0">
+                                        <h4 class="font-bold text-gray-900 leading-snug">{{ $item['etiqueta'] }}</h4>
+                                        <p class="mt-1 text-sm text-gray-500">{{ $item['descripcion'] }}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-auto pt-4">
+                                    @if ($item['disponible'])
+                                        <a href="{{ route($item['ruta']) }}"
+                                           class="flex items-center justify-center gap-1.5 w-full px-4 py-2.5 bg-purple-800 hover:bg-purple-900 text-white text-sm rounded-xl font-semibold transition-colors">
+                                            Ingresar <span aria-hidden="true">→</span>
+                                        </a>
+                                    @else
+                                        <button type="button" disabled
+                                                class="w-full px-4 py-2.5 bg-gray-100 text-gray-500 text-sm rounded-xl font-semibold cursor-not-allowed">
+                                            Pronto
+                                        </button>
+                                    @endif
+                                </div>
+                            </article>
+                        @endforeach
                     </div>
-
-                    <div class="flex flex-col sm:flex-row md:flex-col gap-3 shrink-0">
-                        <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 text-center min-w-[180px]">
-                            <p class="text-xs text-purple-200 font-medium">Rol Asignado</p>
-                            <p class="text-lg font-bold text-white mt-0.5">{{ Auth::user()->rol?->nombre ?? 'Usuario' }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Accesos Rápidos a Módulos según permisos -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {{-- Módulo de Pacientes (CU05/CU06) --}}
-                @if (Auth::user()->tienePermiso('paciente.gestionar'))
-                    <a href="{{ route('pacientes.index') }}" class="group bg-white p-6 rounded-2xl border border-purple-100 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-purple-300 transition-all duration-200 flex flex-col justify-between">
-                        <div class="space-y-3">
-                            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-800 flex items-center justify-center group-hover:bg-purple-800 group-hover:text-white transition-colors duration-200">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-lg text-purple-950 group-hover:text-purple-700 transition-colors">Gestión de Pacientes</h3>
-                                <p class="text-xs text-gray-500 mt-1">Registro de pacientes, cuentas de acceso y antecedentes clínicos.</p>
-                            </div>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-purple-50 flex items-center justify-between text-xs font-semibold text-purple-700 group-hover:text-purple-900">
-                            <span>Acceder al módulo</span>
-                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </div>
-                    </a>
-                @endif
-
-                {{-- Módulo de Citas (CU12, CU13, CU15, CU16, CU17) --}}
-                @if (Auth::user()->tienePermiso('cita.consultar') || Auth::user()->tienePermiso('cita.asistencia'))
-                    <a href="{{ route('citas.index') }}" class="group bg-white p-6 rounded-2xl border border-purple-100 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-purple-300 transition-all duration-200 flex flex-col justify-between">
-                        <div class="space-y-3">
-                            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-800 flex items-center justify-center group-hover:bg-purple-800 group-hover:text-white transition-colors duration-200">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-lg text-purple-950 group-hover:text-purple-700 transition-colors">Gestión de Citas</h3>
-                                <p class="text-xs text-gray-500 mt-1">Fichas disponibles, reservas, reprogramaciones, cancelaciones y asistencia.</p>
-                            </div>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-purple-50 flex items-center justify-between text-xs font-semibold text-purple-700 group-hover:text-purple-900">
-                            <span>Acceder al módulo</span>
-                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </div>
-                    </a>
-                @endif
-
-                {{-- Módulo de Oferta Médica (CU07, CU08, CU09) --}}
-                @if (Auth::user()->tienePermiso('especialidad.gestionar') || Auth::user()->tienePermiso('medico.gestionar') || Auth::user()->tienePermiso('horario.gestionar'))
-                    @php
-                        $rutaOferta = Auth::user()->tienePermiso('especialidad.gestionar')
-                            ? route('especialidades.index')
-                            : (Auth::user()->tienePermiso('medico.gestionar') ? route('medicos.index') : route('horarios.index'));
-                    @endphp
-                    <a href="{{ $rutaOferta }}" class="group bg-white p-6 rounded-2xl border border-purple-100 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-purple-300 transition-all duration-200 flex flex-col justify-between">
-                        <div class="space-y-3">
-                            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-800 flex items-center justify-center group-hover:bg-purple-800 group-hover:text-white transition-colors duration-200">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-lg text-purple-950 group-hover:text-purple-700 transition-colors">Oferta Médica</h3>
-                                <p class="text-xs text-gray-500 mt-1">Especialidades, médicos, matrículas y grilla semanal de horarios con capacidad.</p>
-                            </div>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-purple-50 flex items-center justify-between text-xs font-semibold text-purple-700 group-hover:text-purple-900">
-                            <span>Acceder al módulo</span>
-                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </div>
-                    </a>
-                @endif
-
-                {{-- Módulo de Usuarios (CU02) --}}
-                @if (Auth::user()->tienePermiso('usuario.gestionar'))
-                    <a href="{{ route('usuarios.index') }}" class="group bg-white p-6 rounded-2xl border border-purple-100 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-purple-300 transition-all duration-200 flex flex-col justify-between">
-                        <div class="space-y-3">
-                            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-800 flex items-center justify-center group-hover:bg-purple-800 group-hover:text-white transition-colors duration-200">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-lg text-purple-950 group-hover:text-purple-700 transition-colors">Gestión de Usuarios</h3>
-                                <p class="text-xs text-gray-500 mt-1">Alta, edición, estados de cuentas y restablecimiento de contraseñas de acceso.</p>
-                            </div>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-purple-50 flex items-center justify-between text-xs font-semibold text-purple-700 group-hover:text-purple-900">
-                            <span>Acceder al módulo</span>
-                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </div>
-                    </a>
-                @endif
-
-                {{-- Módulo de Roles y Permisos (CU03) --}}
-                @if (Auth::user()->tienePermiso('rol.gestionar'))
-                    <a href="{{ route('roles.index') }}" class="group bg-white p-6 rounded-2xl border border-purple-100 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-purple-300 transition-all duration-200 flex flex-col justify-between">
-                        <div class="space-y-3">
-                            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-800 flex items-center justify-center group-hover:bg-purple-800 group-hover:text-white transition-colors duration-200">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-lg text-purple-950 group-hover:text-purple-700 transition-colors">Roles y Permisos</h3>
-                                <p class="text-xs text-gray-500 mt-1">Configuración de perfiles de usuario, matriz de permisos y privilegios del sistema.</p>
-                            </div>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-purple-50 flex items-center justify-between text-xs font-semibold text-purple-700 group-hover:text-purple-900">
-                            <span>Acceder al módulo</span>
-                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </div>
-                    </a>
-                @endif
-
-                {{-- Mi Perfil --}}
-                <a href="{{ route('profile.edit') }}" class="group bg-white p-6 rounded-2xl border border-purple-100 shadow-xs hover:shadow-lg hover:shadow-purple-950/10 hover:border-purple-300 transition-all duration-200 flex flex-col justify-between">
-                    <div class="space-y-3">
-                        <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-800 flex items-center justify-center group-hover:bg-purple-800 group-hover:text-white transition-colors duration-200">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg text-purple-950 group-hover:text-purple-700 transition-colors">Mi Perfil</h3>
-                            <p class="text-xs text-gray-500 mt-1">Actualización de datos personales, correo electrónico y cambio de contraseña.</p>
-                        </div>
-                    </div>
-                    <div class="mt-5 pt-3 border-t border-purple-50 flex items-center justify-between text-xs font-semibold text-purple-700 group-hover:text-purple-900">
-                        <span>Configurar cuenta</span>
-                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Información del Sistema de Citas y Normas Clínicas -->
-            <div class="bg-purple-50/60 border border-purple-200/80 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-purple-200/80 text-purple-900 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-sm text-purple-950">Sistema Clínico Vida Salud</h4>
-                        <p class="text-xs text-purple-900/70">Atención y reserva de fichas médicas en turnos programados.</p>
-                    </div>
-                </div>
-                <div class="text-xs text-purple-800 font-medium">
-                    Horario de atención: Lun – Vie 08:00 – 18:00
-                </div>
-            </div>
-
+                </section>
+            @endforeach
         </div>
     </div>
 </x-app-layout>

@@ -2,8 +2,9 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <h2 class="font-bold text-2xl text-purple-950 leading-tight">Historial del paciente</h2>
-            <p class="text-xs text-purple-800/70 mt-0.5">Busque al paciente por CI, nombre, apellido o código</p>
+            <x-encabezado-modulo />
+            <h2 class="text-3xl font-bold text-gray-900 leading-tight">Historial del paciente</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Busque al paciente por CI, nombre, apellido o código</p>
         </div>
     </x-slot>
 

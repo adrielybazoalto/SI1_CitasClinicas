@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\Bitacora;
 use App\Models\User;
 use App\Services\BitacoraService;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -60,25 +61,30 @@ class LoginRequest extends FormRequest
             ->first();
 
         if (! $usuario) {
-            $bitacora->registrar('LOGIN_FALLIDO', 'usuario', null, "Usuario inexistente: {$login}");
+            $bitacora->registrar(Bitacora::INICIO_SESION_FALLIDO, 'usuario', null, "Inicio de sesión fallido: el usuario {$login} no existe");
             $this->fallar('Usuario o contraseña incorrectos.');
         }
 
         // Cuenta bloqueada: no se verifica la contraseña hasta que venza el bloqueo.
         if ($usuario->estaBloqueado()) {
-            $bitacora->registrar('LOGIN_FALLIDO', 'usuario', $usuario->id_usuario, 'Intento con cuenta bloqueada', $usuario->id_usuario);
+            $bitacora->registrar(Bitacora::INICIO_SESION_FALLIDO, 'usuario', $usuario->id_usuario, "Inicio de sesión fallido de {$usuario->username}: la cuenta está bloqueada", $usuario->id_usuario);
             $this->fallar($this->mensajeBloqueo($usuario));
         }
 
         if (! Hash::check((string) $this->input('password'), $usuario->password_hash)) {
             $usuario = $this->registrarIntentoFallido($usuario);
             $bitacora->registrar(
-                'LOGIN_FALLIDO', 'usuario', $usuario->id_usuario,
-                $usuario->estaBloqueado()
-                    ? 'Contraseña incorrecta. Cuenta bloqueada hasta '.$usuario->bloqueado_hasta->format('H:i')
-                    : "Contraseña incorrecta (intento {$usuario->intentos_fallidos})",
+                Bitacora::INICIO_SESION_FALLIDO, 'usuario', $usuario->id_usuario,
+                "Inicio de sesión fallido de {$usuario->username}: contraseña incorrecta (intento {$usuario->intentos_fallidos})",
                 $usuario->id_usuario,
             );
+            if ($usuario->estaBloqueado()) {
+                $bitacora->registrar(
+                    Bitacora::CUENTA_BLOQUEADA, 'usuario', $usuario->id_usuario,
+                    "Cuenta de {$usuario->username} bloqueada hasta las ".$usuario->bloqueado_hasta->format('H:i').' por intentos fallidos',
+                    $usuario->id_usuario,
+                );
+            }
             $this->fallar($usuario->estaBloqueado()
                 ? $this->mensajeBloqueo($usuario)
                 : 'Usuario o contraseña incorrectos.');
@@ -86,7 +92,7 @@ class LoginRequest extends FormRequest
 
         // La contraseña es correcta, pero la cuenta o su rol están desactivados.
         if (! $usuario->estado || ! $usuario->rol?->estado) {
-            $bitacora->registrar('LOGIN_FALLIDO', 'usuario', $usuario->id_usuario, 'Cuenta o rol inactivo', $usuario->id_usuario);
+            $bitacora->registrar(Bitacora::INICIO_SESION_FALLIDO, 'usuario', $usuario->id_usuario, "Inicio de sesión fallido de {$usuario->username}: cuenta o rol inactivo", $usuario->id_usuario);
             $this->fallar('La cuenta está desactivada. Comuníquese con el administrador.');
         }
 
@@ -94,7 +100,7 @@ class LoginRequest extends FormRequest
         $usuario->forceFill(['intentos_fallidos' => 0, 'bloqueado_hasta' => null])->save();
         Auth::login($usuario);
 
-        $bitacora->registrar('LOGIN', 'usuario', $usuario->id_usuario, 'Inicio de sesión');
+        $bitacora->registrar(Bitacora::INICIO_SESION, 'usuario', $usuario->id_usuario, "Inicio de sesión exitoso de {$usuario->username}");
     }
 
     /**

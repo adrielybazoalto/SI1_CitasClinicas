@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Bitacora;
 use App\Models\Rol;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -49,7 +50,7 @@ class UsuarioService
             'estado' => true,
         ]);
 
-        $this->bitacora->registrar('USUARIO_CREADO', 'usuario', $usuario->id_usuario,
+        $this->bitacora->registrar(Bitacora::CREAR_USUARIO, 'usuario', $usuario->id_usuario,
             "Usuario {$usuario->username} con rol ".$usuario->rol->nombre);
 
         return $usuario;
@@ -75,7 +76,7 @@ class UsuarioService
         $usuario->save();
 
         if ($cambios) {
-            $this->bitacora->registrar('USUARIO_MODIFICADO', 'usuario', $usuario->id_usuario,
+            $this->bitacora->registrar(Bitacora::MODIFICAR_USUARIO, 'usuario', $usuario->id_usuario,
                 'Campos modificados: '.implode(', ', $cambios));
         }
 
@@ -109,7 +110,7 @@ class UsuarioService
             }
         });
 
-        $this->bitacora->registrar('USUARIO_ESTADO', 'usuario', $usuario->id_usuario,
+        $this->bitacora->registrar($nuevoEstado ? Bitacora::ACTIVAR_USUARIO : Bitacora::DESACTIVAR_USUARIO, 'usuario', $usuario->id_usuario,
             $nuevoEstado ? 'Usuario activado' : 'Usuario desactivado');
 
         return $usuario;
@@ -131,7 +132,7 @@ class UsuarioService
             'bloqueado_hasta' => null,
         ])->save();
 
-        $this->bitacora->registrar('CLAVE_RESTABLECIDA', 'usuario', $usuario->id_usuario,
+        $this->bitacora->registrar(Bitacora::RESTABLECER_CLAVE, 'usuario', $usuario->id_usuario,
             "Clave temporal generada para {$usuario->username}");
 
         return $temporal;

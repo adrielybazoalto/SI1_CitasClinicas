@@ -8,8 +8,9 @@
                 </svg>
             </a>
             <div>
-                <h2 class="font-bold text-2xl text-purple-950 leading-tight">Permisos del Rol: {{ $rol->nombre }}</h2>
-                <p class="text-xs text-purple-800/70">Seleccione los permisos y operaciones autorizadas para este perfil</p>
+                <x-encabezado-modulo />
+                <h2 class="text-3xl font-bold text-gray-900 leading-tight">Permisos del Rol: {{ $rol->nombre }}</h2>
+                <p class="text-sm text-gray-500">Seleccione los permisos y operaciones autorizadas para este perfil</p>
             </div>
         </div>
     </x-slot>

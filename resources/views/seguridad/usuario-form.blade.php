@@ -9,10 +9,11 @@
                 </svg>
             </a>
             <div>
-                <h2 class="font-bold text-2xl text-purple-950 leading-tight">
+                <x-encabezado-modulo />
+                <h2 class="text-3xl font-bold text-gray-900 leading-tight">
                     {{ $esAlta ? 'Nuevo usuario' : 'Editar usuario: '.$usuario->username }}
                 </h2>
-                <p class="text-xs text-purple-800/70">{{ $esAlta ? 'Complete la información para dar de alta una cuenta' : 'Modifique los datos y el rol asignado a la cuenta' }}</p>
+                <p class="text-sm text-gray-500">{{ $esAlta ? 'Complete la información para dar de alta una cuenta' : 'Modifique los datos y el rol asignado a la cuenta' }}</p>
             </div>
         </div>
     </x-slot>

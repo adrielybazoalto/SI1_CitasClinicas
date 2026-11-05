@@ -3,8 +3,9 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h2 class="font-bold text-2xl text-purple-950 leading-tight">Pacientes</h2>
-                <p class="text-xs text-purple-800/70 mt-0.5">Registro, búsqueda y gestión de pacientes y sus antecedentes clínicos</p>
+                <x-encabezado-modulo />
+                <h2 class="text-3xl font-bold text-gray-900 leading-tight">Pacientes</h2>
+                <p class="text-sm text-gray-500 mt-0.5">Registro, búsqueda y gestión de pacientes y sus antecedentes clínicos</p>
             </div>
             <a href="{{ route('pacientes.create') }}"
                class="inline-flex items-center gap-2 px-4 py-2.5 bg-purple-800 hover:bg-purple-900 active:bg-purple-950 rounded-xl font-semibold text-xs text-white uppercase tracking-wider shadow-sm hover:shadow-md hover:shadow-purple-900/20 transition-all duration-150">
