@@ -319,9 +319,9 @@ class CitaService
      * restricción de exclusión ignora las canceladas.
      * Ciclo 2: reembolso total si faltan ≥ 24 h (RN26).
      */
-    public function cancelar(Cita $cita, string $motivo, User $actor): Cita
+    public function cancelar(Cita $cita, string $motivo, User $actor, bool $reembolsoTotal = false): Cita
     {
-        return DB::transaction(function () use ($cita, $motivo, $actor) {
+        return DB::transaction(function () use ($cita, $motivo, $actor, $reembolsoTotal) {
             $cita = Cita::query()->lockForUpdate()->findOrFail($cita->id_cita);
 
             if ($cita->estado !== CitaEstadoService::PROGRAMADA) {
@@ -339,15 +339,16 @@ class CitaService
             $this->estados->transicionar(
                 $cita,
                 CitaEstadoService::CANCELADA,
-                $motivo.($conAnticipacion ? '' : " (menos de {$horasReembolso} h de anticipación)"),
+                $motivo.($conAnticipacion || $reembolsoTotal ? '' : " (menos de {$horasReembolso} h de anticipación)"),
                 $actor->id_usuario,
                 ['motivo_cancelacion' => mb_substr($motivo, 0, 200)],
             );
 
             // RN26: reembolso total solo si se cancela con la anticipación configurada.
             // Con menos anticipación no hay reembolso: la cita queda Cancelada y Pagada.
-            if ($conAnticipacion && $cita->estado_pago === 'Pagado') {
-                $this->pagos->reembolsar($cita, $actor, 'cancelación con anticipación');
+            // RN28: si la clínica cancela (indisponibilidad médica), el reembolso es total siempre.
+            if (($conAnticipacion || $reembolsoTotal) && $cita->estado_pago === 'Pagado') {
+                $this->pagos->reembolsar($cita, $actor, $reembolsoTotal ? 'cancelación por la clínica' : 'cancelación con anticipación');
             }
 
             $this->notificaciones->avisar($cita, NotificacionService::CANCELACION);

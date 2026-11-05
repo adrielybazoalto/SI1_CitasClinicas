@@ -8,8 +8,10 @@ use App\Http\Controllers\Caja\CobroController;
 use App\Http\Controllers\Citas\AsistenciaController;
 use App\Http\Controllers\Citas\CitaController;
 use App\Http\Controllers\Citas\FichaController;
+use App\Http\Controllers\Citas\ReubicacionController;
 use App\Http\Controllers\Oferta\EspecialidadController;
 use App\Http\Controllers\Oferta\HorarioController;
+use App\Http\Controllers\Oferta\IndisponibilidadController;
 use App\Http\Controllers\Oferta\MedicoController;
 use App\Http\Controllers\Oferta\TarifaController;
 use App\Http\Controllers\Pacientes\AntecedenteController;
@@ -145,7 +147,19 @@ Route::middleware('auth')->group(function () {
             Route::get('/{especialidad}', 'show')->whereNumber('especialidad')->name('show');
         });
 
-    // Oferta médica (CU10 ciclo 2)
+    // Oferta médica · CU10 Registrar indisponibilidad médica y reubicar citas
+    Route::middleware('permiso:indisponibilidad.registrar')->group(function () {
+        Route::get('/oferta/indisponibilidades', [IndisponibilidadController::class, 'index'])->name('indisponibilidades.index');
+        Route::post('/oferta/indisponibilidades', [IndisponibilidadController::class, 'store'])->name('indisponibilidades.store');
+
+        // Citas afectadas (paquete de Citas): reubicar o cancelar.
+        Route::prefix('/oferta/indisponibilidades/{indisponibilidad}')->whereNumber('indisponibilidad')
+            ->name('indisponibilidades.')->controller(ReubicacionController::class)->group(function () {
+                Route::get('/citas', 'index')->name('citas');
+                Route::post('/citas/{cita}/reubicar', 'reubicar')->name('reubicar');
+                Route::post('/citas/{cita}/cancelar', 'cancelar')->name('cancelar');
+            });
+    });
 
     // Citas · CU12 Consultar fichas disponibles
     Route::prefix('citas/fichas')->name('fichas.')

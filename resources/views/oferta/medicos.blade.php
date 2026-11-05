@@ -20,6 +20,13 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
             @include('oferta._tabs')
 
+            @if (session('cu10') && Route::has('indisponibilidades.index'))
+                <div class="p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-sm flex flex-wrap items-center gap-3">
+                    <span>El médico tiene {{ session('cu10')['citas'] }} {{ session('cu10')['citas'] === 1 ? 'cita futura' : 'citas futuras' }}. Registre su indisponibilidad para reubicarlas o cancelarlas.</span>
+                    <a href="{{ route('indisponibilidades.index', ['medico' => session('cu10')['medico']]) }}" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg">Ir a indisponibilidad (CU10)</a>
+                </div>
+            @endif
+
             @if (session('status'))
                 <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl shadow-xs flex items-center gap-3">
                     <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

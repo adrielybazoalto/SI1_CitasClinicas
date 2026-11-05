@@ -84,6 +84,14 @@ class MedicoController extends Controller
     {
         $medico = $this->servicio->cambiarEstado($medico, ! $medico->estado, $request->user());
 
-        return back()->with('status', "Médico {$medico->nombre_completo} ".($medico->estado ? 'activado.' : 'desactivado.'));
+        $respuesta = back()->with('status', "Médico {$medico->nombre_completo} ".($medico->estado ? 'activado.' : 'desactivado.'));
+
+        // CU08 → CU10: si quedan citas futuras, se ofrece registrar la indisponibilidad y reubicarlas.
+        $citasFuturas = $medico->estado ? 0 : $medico->citas()
+            ->whereIn('estado', ['Programada', 'Confirmada'])
+            ->whereDate('fecha', '>=', now()->toDateString())
+            ->count();
+
+        return $citasFuturas > 0 ? $respuesta->with('cu10', ['medico' => $medico->id_medico, 'citas' => $citasFuturas]) : $respuesta;
     }
 }

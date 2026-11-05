@@ -78,7 +78,7 @@ Un paquete **nunca** llama a otro que esté por encima de él en esta lista. Las
 | P2 | CU05, CU06 | 1 | ✅ Hecho |
 | P2 | CU04 | 2 | ⬜ Vacío (`PerfilController`) |
 | P3 | CU07, CU08, CU09 | 1 | ✅ Hecho |
-| P3 | CU10, CU11 | 2 | ✅ CU11 hecho (04/11) · ⬜ CU10 |
+| P3 | CU10, CU11 | 2 | ✅ Hechos (04/11) · CU10: falta decidir Confirmada → Cancelada |
 | P4 | CU12, CU13, CU15, CU16, CU17 | 1 | ✅ Hecho en la rama `adriely` (falta llevarlo a `main`) |
 | P4 | CU14 + voz | 2 | ⬜ Vacíos (`PagoController`, `PayPalService`) |
 | P5 | CU20, CU21, CU22 | 1 | ✅ Hecho en `amalia` (04/11) |
@@ -290,14 +290,14 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 - [x] Actualiza la columna `permiso.paquete`: `caja.gestionar`, `caja.cobrar` y `reporte.generar` pasan a **'Finanzas y Reportes'** (en `SeguridadSeeder` y con un `UPDATE` en la migración `2026_11_04_000002`, **pendiente de aplicar en Supabase**). Así, la matriz de CU03 muestra los 6 paquetes.
 
 ### P3 · CU10 Registrar indisponibilidad médica y reubicar citas
-- [ ] Registro de un periodo (inicio < fin y motivo) con `permiso:indisponibilidad.registrar`. A partir de ese momento, `DisponibilidadService` ya no ofrece esos horarios (verifica que lo haga).
-- [ ] Lista de las citas Programada y Confirmada afectadas.
-- [ ] Por cada cita:
+- [x] Registro de un periodo (inicio < fin y motivo) con `permiso:indisponibilidad.registrar`. A partir de ese momento, `DisponibilidadService` ya no ofrece esos horarios (verifica que lo haga).
+- [x] Lista de las citas Programada y Confirmada afectadas.
+- [x] Por cada cita:
   - **Reubicar:** propone los primeros horarios libres del mismo médico o de otro médico de la misma especialidad. Usa `CitaService::reprogramar` en modo forzado (sin el límite de RN27) y conserva el código.
   - **Cancelar:** con el motivo "indisponibilidad médica" y **reembolso total** si estaba pagada (RN28).
-- [ ] Envía un correo a cada paciente afectado (`NotificacionService`).
-- [ ] **Decisión pendiente:** la tabla de estados no permite Confirmada → Cancelada. Pregúntale a la usuaria si se habilita **solo** para CU10, antes de cambiar `CitaEstadoService`.
-- [ ] CU08: al desactivar un médico que tiene citas futuras, se ofrece ir a CU10.
+- [x] Envía un correo a cada paciente afectado (`NotificacionService`).
+- [ ] **Decisión pendiente:** la tabla de estados no permite Confirmada → Cancelada. Por ahora las citas Confirmadas afectadas solo se muestran con un aviso; falta que la usuaria decida si se habilita **solo** para CU10.
+- [x] CU08: al desactivar un médico que tiene citas futuras, se ofrece ir a CU10.
 
 ### P2 · CU04 Gestionar perfil del paciente
 - [ ] "Mi perfil" con `permiso:perfil.gestionar`: el paciente solo accede a su propio registro.

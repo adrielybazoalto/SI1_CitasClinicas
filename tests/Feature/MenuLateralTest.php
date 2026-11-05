@@ -57,7 +57,7 @@ class MenuLateralTest extends TestCase
         foreach (['Seguridad y Accesos', 'Gestión de Pacientes', 'Oferta Médica', 'Gestión de Citas', 'Atención Médica', 'Gestión Financiera y Reportes'] as $paquete) {
             $respuesta->assertSee($paquete);
         }
-        $respuesta->assertSee('Consultar bitácora (CU24)')->assertSee('Pronto');
+        $respuesta->assertSee('Consultar bitácora (CU24)')->assertSee('Gestionar caja (CU18)');
     }
 
     public function test_el_paciente_solo_ve_sus_casos_de_uso(): void
