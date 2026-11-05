@@ -49,6 +49,7 @@ class CitaService
         private NotificacionService $notificaciones,
         private BitacoraService $bitacora,
         private TarifaService $tarifas,
+        private PagoService $pagos,
     ) {
     }
 
@@ -343,6 +344,12 @@ class CitaService
                 ['motivo_cancelacion' => mb_substr($motivo, 0, 200)],
             );
 
+            // RN26: reembolso total solo si se cancela con la anticipación configurada.
+            // Con menos anticipación no hay reembolso: la cita queda Cancelada y Pagada.
+            if ($conAnticipacion && $cita->estado_pago === 'Pagado') {
+                $this->pagos->reembolsar($cita, $actor, 'cancelación con anticipación');
+            }
+
             $this->notificaciones->avisar($cita, NotificacionService::CANCELACION);
 
             $this->bitacora->registrar(Bitacora::CANCELAR_CITA, 'cita', $cita->id_cita, "Cita {$cita->codigo} cancelada: {$motivo}", $actor->id_usuario);
@@ -373,6 +380,11 @@ class CitaService
 
             if (! $cita->fecha->isSameDay($ahora)) {
                 throw ValidationException::withMessages(['cita' => 'La llegada solo se registra el día de la cita.']);
+            }
+
+            // CU17 en el ciclo 2: la cita con precio debe estar pagada antes de la consulta.
+            if ((float) $cita->monto > 0 && $cita->estado_pago !== 'Pagado') {
+                throw ValidationException::withMessages(['cita' => "La cita {$cita->codigo} está pendiente de pago: cóbrela primero (CU19)."]);
             }
 
             if ($ahora->gt($inicio->addMinutes((int) config('clinica.inasistencia_min_despues', 15)))) {

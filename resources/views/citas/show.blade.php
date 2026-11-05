@@ -64,6 +64,11 @@
                                 <dd class="mt-1 text-gray-700">{{ $cita->hora_llegada->format('d/m/Y H:i') }}</dd>
                             </div>
                         @endif
+                        <div>
+                            <dt class="text-[10px] font-bold text-purple-900/60 uppercase tracking-wider">Precio y pago</dt>
+                            <dd class="mt-1 font-semibold text-purple-950">{{ $cita->monto !== null ? 'Bs '.number_format((float) $cita->monto, 2, ',', '.') : 'Sin tarifa' }}</dd>
+                            <dd class="text-xs {{ $cita->estado_pago === 'Pagado' ? 'text-emerald-700' : ($cita->estado_pago === 'Reembolsado' ? 'text-sky-700' : 'text-amber-700') }}">{{ $cita->estado_pago }}</dd>
+                        </div>
                         @if ($cita->motivo_cancelacion)
                             <div>
                                 <dt class="text-[10px] font-bold text-purple-900/60 uppercase tracking-wider">Motivo de cancelación</dt>
@@ -75,6 +80,14 @@
 
                 <!-- Acciones disponibles según estado y permisos -->
                 <div class="space-y-4">
+                    @if (app(\App\Services\PagoService::class)->cobrable($cita) && $usuario->tienePermiso('caja.cobrar'))
+                        {{-- CU19 extiende a CU13: cobrar en mostrador al reservar --}}
+                        <a href="{{ route('cobros.create', $cita) }}"
+                           class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-semibold text-xs text-white uppercase tracking-wider transition-colors">
+                            Cobrar ahora · Bs {{ number_format((float) $cita->monto, 2, ',', '.') }}
+                        </a>
+                    @endif
+
                     @if ($programada && $usuario->tienePermiso('cita.reprogramar'))
                         <a href="{{ route('citas.reprogramar', $cita) }}"
                            class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-purple-800 hover:bg-purple-900 rounded-xl font-semibold text-xs text-white uppercase tracking-wider transition-colors">

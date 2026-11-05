@@ -3,6 +3,8 @@
 use App\Http\Controllers\Atencion\AgendaController;
 use App\Http\Controllers\Atencion\AtencionController;
 use App\Http\Controllers\Atencion\HistorialController;
+use App\Http\Controllers\Caja\CajaController;
+use App\Http\Controllers\Caja\CobroController;
 use App\Http\Controllers\Citas\AsistenciaController;
 use App\Http\Controllers\Citas\CitaController;
 use App\Http\Controllers\Citas\FichaController;
@@ -201,5 +203,25 @@ Route::middleware('auth')->group(function () {
             Route::get('/exportar/{formato}', 'exportar')->whereIn('formato', ['pdf', 'csv'])->name('exportar');
         });
 
-    // Caja (CU18, CU19 ciclo 2)
+    // Finanzas · CU18 Gestionar caja
+    Route::prefix('caja')->name('caja.')
+        ->middleware('permiso:caja.gestionar')
+        ->controller(CajaController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/abrir', 'abrir')->name('abrir');
+            Route::post('/cerrar', 'cerrar')->name('cerrar');
+            Route::get('/{caja}/arqueo', 'arqueo')->whereNumber('caja')->name('arqueo');
+        });
+
+    // Finanzas · CU19 Cobrar cita en mostrador y emitir comprobante
+    Route::prefix('cobros')->name('cobros.')
+        ->middleware('permiso:caja.cobrar')
+        ->controller(CobroController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/citas/{cita}', 'create')->name('create');
+            Route::post('/citas/{cita}', 'store')->name('store');
+            Route::get('/comprobantes/{pago}', 'verComprobante')->whereNumber('pago')->name('comprobante.ver');
+            Route::get('/comprobantes/{pago}/pdf', 'comprobante')->whereNumber('pago')->name('comprobante');
+            Route::post('/comprobantes/{pago}/enviar', 'enviar')->whereNumber('pago')->name('enviar');
+        });
 });

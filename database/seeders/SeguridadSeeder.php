@@ -44,14 +44,14 @@ class SeguridadSeeder extends Seeder
         'cita.asistencia' => ['Registrar asistencia e inasistencia', 'Citas'],
         'pago.en_linea' => ['Pagar citas en línea', 'Citas'],
 
-        'caja.gestionar' => ['Abrir y cerrar caja', 'Caja'],
-        'caja.cobrar' => ['Cobrar citas en mostrador', 'Caja'],
+        'caja.gestionar' => ['Abrir y cerrar caja', 'Finanzas y Reportes'],
+        'caja.cobrar' => ['Cobrar citas en mostrador', 'Finanzas y Reportes'],
 
         'agenda.consultar' => ['Consultar agenda médica', 'Atencion'],
         'atencion.registrar' => ['Registrar atención médica', 'Atencion'],
         'historial.consultar' => ['Consultar historial del paciente', 'Atencion'],
 
-        'reporte.generar' => ['Generar reportes', 'Reportes'],
+        'reporte.generar' => ['Generar reportes', 'Finanzas y Reportes'],
     ];
 
     /** Permisos iniciales por rol (misma matriz que los datos de Supabase). */

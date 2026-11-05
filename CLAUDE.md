@@ -83,7 +83,7 @@ Un paquete **nunca** llama a otro que esté por encima de él en esta lista. Las
 | P4 | CU14 + voz | 2 | ⬜ Vacíos (`PagoController`, `PayPalService`) |
 | P5 | CU20, CU21, CU22 | 1 | ✅ Hecho en `amalia` (04/11) |
 | P6 | CU23 | 1 | ✅ Hecho en `amalia` (04/11) |
-| P6 | CU18, CU19 | 2 | ⬜ Vacíos (`CajaService`, `CobroController`) |
+| P6 | CU18, CU19 | 2 | ✅ Hechos (04/11) |
 
 ---
 
@@ -274,20 +274,20 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 - [x] **RN22:** `CitaService::programar` guarda en `cita.monto` la tarifa vigente al momento de reservar. Las citas ya reservadas conservan su precio.
 
 ### P6 · CU18 Gestionar caja
-- [ ] `CajaService::abrir(usuario, monto_inicial)`: una sola caja ABIERTA por usuario (índice `ux_caja_abierta`). Si ya tiene una abierta, se muestra esa.
-- [ ] Cierre: la usuaria ingresa el conteo **por método de pago**. Efectivo esperado = monto inicial + cobros en efectivo − reembolsos en efectivo. Se calcula la diferencia; si no es cero, la observación es **obligatoria** (sobrante o faltante).
-- [ ] Una caja cerrada no se modifica. Reporte de arqueo en PDF.
+- [x] `CajaService::abrir(usuario, monto_inicial)`: una sola caja ABIERTA por usuario (índice `ux_caja_abierta`). Si ya tiene una abierta, se muestra esa.
+- [x] Cierre: la usuaria ingresa el conteo **por método de pago**. Efectivo esperado = monto inicial + cobros en efectivo − reembolsos en efectivo. Se calcula la diferencia; si no es cero, la observación es **obligatoria** (sobrante o faltante).
+- [x] Una caja cerrada no se modifica. Reporte de arqueo en PDF.
 
 ### P6 · CU19 Cobrar cita en mostrador y emitir comprobante (extiende a CU13)
-- [ ] Requiere una caja abierta; si no hay, redirige a abrirla.
-- [ ] Cita Programada con `estado_pago = Pendiente`. El monto es `cita.monto`.
-- [ ] Métodos: EFECTIVO (monto recibido ≥ monto, con cálculo del cambio), TARJETA o TRANSFERENCIA.
-- [ ] En una sola transacción: `pago` (COBRO, APROBADO, `id_caja`) → `cita.estado_pago = Pagado` → `comprobante` con **número correlativo** (bloquea con `lockForUpdate` para que no se repita).
-- [ ] Comprobante interno en PDF para imprimir o enviar al correo del paciente.
-- [ ] Al programar una cita en mostrador (CU13, canal MOSTRADOR), se ofrece cobrarla en ese momento.
-- [ ] **Reembolsos (RF41, subflujo de CU16):** si se cancela una cita pagada con 24 horas o más de anticipación, se registra un `pago` tipo REEMBOLSO y `estado_pago = Reembolsado`. Con menos de 24 horas, no hay reembolso (RN26).
-- [ ] **CU17 en el ciclo 2:** para registrar la llegada, el pago debe estar en Pagado; si no lo está, se pide cobrar primero.
-- [ ] Actualiza la columna `permiso.paquete`: `caja.gestionar`, `caja.cobrar` y `reporte.generar` pasan a **'Finanzas y Reportes'** (en `SeguridadSeeder` y con un `UPDATE` en una migración nueva). Así, la matriz de CU03 muestra los 6 paquetes.
+- [x] Requiere una caja abierta; si no hay, redirige a abrirla.
+- [x] Cita Programada con `estado_pago = Pendiente`. El monto es `cita.monto`.
+- [x] Métodos: EFECTIVO (monto recibido ≥ monto, con cálculo del cambio), TARJETA o TRANSFERENCIA.
+- [x] En una sola transacción: `pago` (COBRO, APROBADO, `id_caja`) → `cita.estado_pago = Pagado` → `comprobante` con **número correlativo** (bloquea con `lockForUpdate` para que no se repita).
+- [x] Comprobante interno en PDF para imprimir o enviar al correo del paciente.
+- [x] Al programar una cita en mostrador (CU13, canal MOSTRADOR), se ofrece cobrarla en ese momento.
+- [x] **Reembolsos (RF41, subflujo de CU16):** si se cancela una cita pagada con 24 horas o más de anticipación, se registra un `pago` tipo REEMBOLSO y `estado_pago = Reembolsado`. Con menos de 24 horas, no hay reembolso (RN26).
+- [x] **CU17 en el ciclo 2:** para registrar la llegada, el pago debe estar en Pagado; si no lo está, se pide cobrar primero.
+- [x] Actualiza la columna `permiso.paquete`: `caja.gestionar`, `caja.cobrar` y `reporte.generar` pasan a **'Finanzas y Reportes'** (en `SeguridadSeeder` y con un `UPDATE` en la migración `2026_11_04_000002`, **pendiente de aplicar en Supabase**). Así, la matriz de CU03 muestra los 6 paquetes.
 
 ### P3 · CU10 Registrar indisponibilidad médica y reubicar citas
 - [ ] Registro de un periodo (inicio < fin y motivo) con `permiso:indisponibilidad.registrar`. A partir de ese momento, `DisponibilidadService` ya no ofrece esos horarios (verifica que lo haga).
