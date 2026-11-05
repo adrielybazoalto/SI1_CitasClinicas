@@ -605,7 +605,10 @@ class OfertaMedicaTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Oferta Médica');
-        $response->assertSee('Oferta médica');
+        // Menú lateral por paquetes: P3 con sus casos de uso.
+        $response->assertSee('P3');
+        $response->assertSee(route('especialidades.index'), false);
+        $response->assertSee('Horarios de atención');
     }
 
     public function test_especialidad_index_filtra_por_estado(): void

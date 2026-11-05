@@ -14,24 +14,24 @@
     <style>
         @page { margin: 90px 36px 50px 36px; }
         body { font-family: DejaVu Sans, sans-serif; font-size: 9.5px; color: #1f2937; }
-        header { position: fixed; top: -70px; left: 0; right: 0; height: 60px; border-bottom: 2px solid #6b21a8; }
+        header { position: fixed; top: -70px; left: 0; right: 0; height: 60px; border-bottom: 2px solid #5a215e; }
         footer { position: fixed; bottom: -32px; left: 0; right: 0; font-size: 8px; color: #6b7280; text-align: center; }
-        .logo { display: inline-block; width: 34px; height: 34px; background: #6b21a8; border-radius: 8px; position: relative; vertical-align: middle; }
+        .logo { display: inline-block; width: 34px; height: 34px; background: #5a215e; border-radius: 8px; position: relative; vertical-align: middle; }
         .logo .v { position: absolute; left: 14px; top: 6px; width: 6px; height: 22px; background: #fff; }
         .logo .h { position: absolute; left: 6px; top: 14px; width: 22px; height: 6px; background: #fff; }
         .marca { display: inline-block; vertical-align: middle; margin-left: 8px; }
-        .marca b { font-size: 15px; color: #3b0764; }
+        .marca b { font-size: 15px; color: #2e0b31; }
         .marca span { display: block; font-size: 8px; color: #6b7280; }
         .emision { position: absolute; right: 0; top: 8px; text-align: right; font-size: 8px; color: #6b7280; }
-        h1 { font-size: 14px; color: #3b0764; margin: 0 0 2px; }
+        h1 { font-size: 14px; color: #2e0b31; margin: 0 0 2px; }
         .sub { color: #6b7280; margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #f3e8ff; color: #581c87; text-align: left; font-size: 8px; text-transform: uppercase; padding: 5px; border-bottom: 1px solid #d8b4fe; }
+        th { background: #f4e9f4; color: #4a1a4e; text-align: left; font-size: 8px; text-transform: uppercase; padding: 5px; border-bottom: 1px solid #e8d2e8; }
         td { padding: 4px 5px; border-bottom: 1px solid #f3f4f6; }
         .num { text-align: right; }
-        .grupo td { background: #faf5ff; font-weight: bold; color: #3b0764; }
+        .grupo td { background: #fbf6fb; font-weight: bold; color: #2e0b31; }
         .subtotal td { background: #f9fafb; font-weight: bold; }
-        .total td { background: #e9d5ff; font-weight: bold; color: #3b0764; border-top: 2px solid #6b21a8; }
+        .total td { background: #e8d2e8; font-weight: bold; color: #2e0b31; border-top: 2px solid #5a215e; }
         .vacio { padding: 30px; text-align: center; color: #6b7280; }
     </style>
 </head>

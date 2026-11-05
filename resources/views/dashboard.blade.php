@@ -18,10 +18,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             <!-- Banner de Bienvenida Vida Salud con Gradiente Púrpura Corporativo -->
-            <div class="relative overflow-hidden bg-gradient-to-r from-purple-950 via-purple-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-10 shadow-xl shadow-purple-950/15 border border-purple-800/40">
+            <div class="relative overflow-hidden bg-gradient-to-r from-purple-950 via-purple-900 to-purple-950 text-white rounded-3xl p-6 sm:p-10 shadow-xl shadow-purple-950/15 border border-purple-800/40">
                 <!-- Efectos de luz ambiental -->
                 <div class="absolute -right-16 -top-16 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute right-1/3 -bottom-20 w-80 h-80 bg-fuchsia-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute right-1/3 -bottom-20 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                     <div class="space-y-3 max-w-2xl">

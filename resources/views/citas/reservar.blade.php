@@ -41,7 +41,7 @@
             @include('citas._alertas')
 
             @if ($reprogramando)
-                <div class="p-4 bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-xl text-sm">
+                <div class="p-4 bg-purple-50 border border-purple-200 text-purple-900 rounded-xl text-sm">
                     Cita actual: <strong>{{ $cita->fecha->format('d/m/Y') }} a las {{ $cita->hora_inicio_corta }}</strong>
                     · ficha {{ $cita->nro_cita }} · {{ $cita->medico?->nombre_completo }}
                     · reprogramada {{ $cita->veces_reprogramada }} vez/veces
@@ -110,7 +110,7 @@
                             <li class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-rose-100 border border-rose-200"></span> Ocupada</li>
                             <li class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-gray-100 border border-gray-200"></span> Pasada, bloqueada o fuera de la ventana</li>
                             @if ($esPaciente)
-                                <li class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-fuchsia-50 border border-fuchsia-200"></span> Reservada para mostrador</li>
+                                <li class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-purple-50 border border-purple-200"></span> Reservada para mostrador</li>
                             @endif
                         </ul>
                     </div>
@@ -248,7 +248,7 @@
                 const estilos = {
                     libre: 'bg-emerald-50 border-emerald-300 text-emerald-900 hover:bg-emerald-100 cursor-pointer',
                     ocupada: 'bg-rose-50 border-rose-200 text-rose-400 cursor-not-allowed',
-                    otro_canal: 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-400 cursor-not-allowed',
+                    otro_canal: 'bg-purple-50 border-purple-200 text-purple-400 cursor-not-allowed',
                     seleccionada: 'bg-purple-700 border-purple-800 text-white',
                 };
                 const textos = {

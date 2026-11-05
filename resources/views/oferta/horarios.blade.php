@@ -50,13 +50,13 @@
                     <p class="text-[11px] text-gray-400">fichas por semana</p>
                 </div>
                 <div class="bg-white p-4 rounded-2xl border border-purple-100 shadow-xs">
-                    <p class="text-[10px] font-bold text-indigo-700/70 uppercase tracking-wider">Cupos en línea</p>
-                    <p class="mt-1 text-2xl font-bold text-indigo-700">{{ $resumen['cupos_linea'] }}</p>
+                    <p class="text-[10px] font-bold text-purple-700/70 uppercase tracking-wider">Cupos en línea</p>
+                    <p class="mt-1 text-2xl font-bold text-purple-700">{{ $resumen['cupos_linea'] }}</p>
                     <p class="text-[11px] text-gray-400">{{ (int) config('clinica.porcentaje_linea', 70) }}% de la capacidad</p>
                 </div>
                 <div class="bg-white p-4 rounded-2xl border border-purple-100 shadow-xs">
-                    <p class="text-[10px] font-bold text-fuchsia-700/70 uppercase tracking-wider">Cupos en mostrador</p>
-                    <p class="mt-1 text-2xl font-bold text-fuchsia-700">{{ $resumen['cupos_mostrador'] }}</p>
+                    <p class="text-[10px] font-bold text-purple-700/70 uppercase tracking-wider">Cupos en mostrador</p>
+                    <p class="mt-1 text-2xl font-bold text-purple-700">{{ $resumen['cupos_mostrador'] }}</p>
                     <p class="text-[11px] text-gray-400">{{ (int) config('clinica.porcentaje_mostrador', 30) }}% de la capacidad</p>
                 </div>
             </div>
@@ -160,9 +160,9 @@
                                     <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                         <p class="text-sm font-semibold text-purple-950">{{ $horario->capacidad }} fichas</p>
                                         <p class="text-[11px] text-gray-500 mt-0.5">
-                                            <span class="text-indigo-600 font-semibold">{{ $horario->cupos_linea }} en línea</span>
+                                            <span class="text-purple-600 font-semibold">{{ $horario->cupos_linea }} en línea</span>
                                             <span class="mx-1 text-gray-300">·</span>
-                                            <span class="text-fuchsia-600 font-semibold">{{ $horario->cupos_mostrador }} mostrador</span>
+                                            <span class="text-purple-600 font-semibold">{{ $horario->cupos_mostrador }} mostrador</span>
                                         </p>
                                     </td>
                                     <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-700">

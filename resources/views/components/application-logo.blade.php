@@ -16,16 +16,16 @@
         <svg class="{{ $currentSize }}" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="hc-purple-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#7E22CE" />
-                    <stop offset="50%" stop-color="#6B21A8" />
-                    <stop offset="100%" stop-color="#4C1D95" />
+                    <stop offset="0%" stop-color="#7F3F84" />
+                    <stop offset="50%" stop-color="#5A215E" />
+                    <stop offset="100%" stop-color="#4A1A4E" />
                 </linearGradient>
                 <linearGradient id="hc-accent-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#F3E8FF" />
+                    <stop offset="0%" stop-color="#F4E9F4" />
                     <stop offset="100%" stop-color="#FFFFFF" />
                 </linearGradient>
                 <filter id="hc-shadow" x="-10%" y="-10%" width="130%" height="130%" filterUnits="userSpaceOnUse">
-                    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#4C1D95" flood-opacity="0.25" />
+                    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#4A1A4E" flood-opacity="0.25" />
                 </filter>
             </defs>
 
@@ -43,7 +43,7 @@
 
             <!-- Detalle central de pulso vital / corazón médico -->
             <path d="M22 32h5l2.5-4.5 4.5 9 3-5.5 2 2h5" 
-                  stroke="#7E22CE" 
+                  stroke="#7F3F84" 
                   stroke-width="2.5" 
                   stroke-linecap="round" 
                   stroke-linejoin="round" />

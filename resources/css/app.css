@@ -9,20 +9,20 @@
         height: 8px;
     }
     ::-webkit-scrollbar-track {
-        background: #FAF5FF;
+        background: #FBF6FB;
     }
     ::-webkit-scrollbar-thumb {
-        background: #D8B4FE;
+        background: #E8D2E8;
         border-radius: 9999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: #A855F7;
+        background: #9B5A9F;
     }
 
     /* Modern selection style */
     ::selection {
-        background-color: #E9D5FF;
-        color: #581C87;
+        background-color: #E8D2E8;
+        color: #4A1A4E;
     }
 }
 
@@ -30,7 +30,7 @@
     .bg-grid-purple {
         background-size: 32px 32px;
         background-image: 
-            linear-gradient(to right, rgba(168, 85, 247, 0.05) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+            linear-gradient(to right, rgba(155, 90, 159, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(155, 90, 159, 0.05) 1px, transparent 1px);
     }
 }

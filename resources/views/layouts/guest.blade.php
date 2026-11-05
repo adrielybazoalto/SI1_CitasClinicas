@@ -21,7 +21,7 @@
         <div class="absolute bottom-0 left-10 -mb-24 w-80 h-80 bg-purple-400/15 rounded-full blur-3xl pointer-events-none"></div>
 
         <!-- Barra superior decorativa morada -->
-        <div class="h-1.5 w-full bg-gradient-to-r from-purple-900 via-purple-700 to-indigo-800"></div>
+        <div class="h-1.5 w-full bg-gradient-to-r from-purple-900 via-purple-700 to-purple-800"></div>
 
         <!-- Contenido Central -->
         <div class="flex-1 flex flex-col justify-center items-center px-4 py-8 sm:py-12 relative z-10">
