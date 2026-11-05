@@ -33,7 +33,7 @@
                                 </div>
                                 <div class="mt-auto pt-4">
                                     @if ($item['disponible'])
-                                        <a href="{{ route($item['ruta']) }}"
+                                        <a href="{{ $item['url'] }}"
                                            class="flex items-center justify-center gap-1.5 w-full px-4 py-2.5 bg-purple-800 hover:bg-purple-900 text-white text-sm rounded-xl font-semibold transition-colors">
                                             Ingresar <span aria-hidden="true">→</span>
                                         </a>

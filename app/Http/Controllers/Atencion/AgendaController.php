@@ -28,6 +28,7 @@ class AgendaController extends Controller
             'fecha' => ['nullable', 'date_format:Y-m-d'],
             'estado' => ['nullable', 'in:'.implode(',', array_keys(AtencionService::FILTROS_ESTADO))],
             'vista' => ['nullable', 'in:dia,semana'],
+            'accion' => ['nullable', 'in:atender'],
         ], [
             'fecha.date_format' => 'La fecha no es válida.',
             'estado.in' => 'El filtro de estado no es válido.',
@@ -36,7 +37,9 @@ class AgendaController extends Controller
         $usuario = $request->user();
         $fecha = isset($datos['fecha']) ? CarbonImmutable::parse($datos['fecha']) : CarbonImmutable::today();
         $vista = $datos['vista'] ?? 'dia';
-        $estado = $datos['estado'] ?? null;
+        // CU21 (?accion=atender): misma pantalla, filtrada a las citas Confirmadas.
+        $accion = $datos['accion'] ?? null;
+        $estado = $datos['estado'] ?? ($accion === 'atender' ? 'confirmadas' : null);
         $esMedico = $this->servicio->esMedico($usuario);
         $medico = $this->servicio->medicoAgenda($usuario, isset($datos['medico']) ? (int) $datos['medico'] : null);
 
@@ -47,6 +50,7 @@ class AgendaController extends Controller
             'fecha' => $fecha,
             'vista' => $vista,
             'estado' => $estado,
+            'accion' => $accion,
             'filtrosEstado' => array_keys(AtencionService::FILTROS_ESTADO),
             'verMotivo' => $this->servicio->puedeVerMotivo($usuario),
             'puedeAtender' => $usuario->tienePermiso('atencion.registrar'),

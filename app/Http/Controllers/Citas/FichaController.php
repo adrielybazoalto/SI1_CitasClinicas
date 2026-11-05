@@ -36,7 +36,8 @@ class FichaController extends Controller
             'cita' => null,
             'canal' => $this->citas->canalDe($usuario),
             'pacienteActual' => $this->citas->pacienteDe($usuario),
-            'puedeReservar' => $usuario->tienePermiso('cita.programar'),
+            // CU12 (?accion=consultar): solo consulta, sin el formulario de reserva de CU13.
+            'puedeReservar' => $usuario->tienePermiso('cita.programar') && $request->query('accion') !== 'consultar',
             'pacienteInicial' => $request->integer('paciente')
                 ? Paciente::query()->where('estado', true)->find($request->integer('paciente'))
                 : null,

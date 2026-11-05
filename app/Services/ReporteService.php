@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Bitacora;
 use App\Models\Especialidad;
 use App\Models\Medico;
 use App\Models\User;
@@ -30,11 +29,10 @@ class ReporteService
         'pacientes' => ['Pacientes registrados', false, true],
         'totales_periodo' => ['Atendidas, canceladas e inasistencias por periodo', false, true],
         'agenda_diaria' => ['Agenda diaria por médico', false, false],
-        'bitacora' => ['Consulta de bitácora', true, true],
         'ingresos' => ['Ingresos por periodo', true, true],
     ];
 
-    /** Permiso que habilita los reportes exclusivos del administrador. */
+    /** Permiso que habilita los reportes exclusivos del administrador (ingresos). La bitácora se consulta en CU24. */
     public const PERMISO_ADMIN = 'bitacora.ver';
 
     /** Tipos disponibles para el usuario. @return array<string, string> */
@@ -81,7 +79,6 @@ class ReporteService
             'por_estado' => $this->porEstado($f),
             'pacientes' => $this->pacientes($f),
             'totales_periodo' => $this->totalesPorPeriodo($f),
-            'bitacora' => $this->bitacora($f),
             'ingresos' => $this->ingresos($f),
         };
 
@@ -181,29 +178,6 @@ class ReporteService
         $columnas = ['periodo' => 'Mes'] + $this->etiquetasPorEstado(['Atendida', 'Cancelada', 'Inasistencia']);
 
         return $this->sinGrupos($filas->map(fn ($r) => $this->enteros((array) $r))->all(), $columnas);
-    }
-
-    /** Solo administrador · registros de la bitácora del periodo. */
-    private function bitacora(array $f): array
-    {
-        $filas = DB::table('bitacora as b')
-            ->leftJoin('usuario as u', 'u.id_usuario', '=', 'b.id_usuario')
-            ->where('b.fecha_hora', '>=', $f['desde'].' 00:00:00')
-            ->where('b.fecha_hora', '<=', $f['hasta'].' 23:59:59')
-            ->orderByDesc('b.fecha_hora')
-            ->limit(2000)
-            ->get([
-                DB::raw("substr(cast(b.fecha_hora as text), 1, 16) as fecha_hora"),
-                DB::raw("coalesce(u.username, 'Sistema') as usuario"),
-                'b.accion', 'b.tabla', 'b.ip', 'b.detalle',
-            ]);
-
-        $columnas = ['fecha_hora' => 'Fecha y hora', 'usuario' => 'Usuario', 'accion' => 'Acción', 'tabla' => 'Tabla', 'ip' => 'IP', 'detalle' => 'Detalle'];
-
-        // Los registros antiguos (LOGIN, LOGOUT…) se muestran con el nombre en español.
-        $filas = $filas->map(fn ($r) => ['accion' => Bitacora::accionLegible($r->accion)] + (array) $r);
-
-        return $this->sinGrupos($filas->all(), $columnas, conteo: 'registros');
     }
 
     /** Solo administrador · cobros − reembolsos aprobados, por día y método. */

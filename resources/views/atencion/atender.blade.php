@@ -4,7 +4,7 @@
     $etiqueta = 'text-xs font-semibold uppercase text-purple-950/80';
     $alergias = trim((string) $antecedente?->alergias);
     $tieneAlergias = $alergias !== '' && ! preg_match('/^(ninguna|no|niega)/i', $alergias);
-    $volver = route('agenda.index', ['fecha' => $cita->fecha->toDateString()]);
+    $volver = route('agenda.index', ['fecha' => $cita->fecha->toDateString(), 'accion' => 'atender']);
 @endphp
 <x-app-layout>
     <x-slot name="header">

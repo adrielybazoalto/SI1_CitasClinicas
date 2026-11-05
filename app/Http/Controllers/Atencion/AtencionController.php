@@ -29,7 +29,7 @@ class AtencionController extends Controller
         abort_unless($this->servicio->puedeAtender($cita, $request->user()), 403, 'Solo el médico de la cita puede atenderla.');
 
         if ($cita->estado !== CitaEstadoService::CONFIRMADA) {
-            return redirect()->route('agenda.index', ['fecha' => $cita->fecha->toDateString()])
+            return redirect()->route('agenda.index', ['fecha' => $cita->fecha->toDateString(), 'accion' => 'atender'])
                 ->with('error', "La cita {$cita->codigo} está {$cita->estado}: solo se atienden citas Confirmadas.");
         }
 
@@ -43,7 +43,7 @@ class AtencionController extends Controller
 
         $this->servicio->registrar($cita, $request->validated(), $request->user());
 
-        return redirect()->route('agenda.index', ['fecha' => $cita->fecha->toDateString()])
+        return redirect()->route('agenda.index', ['fecha' => $cita->fecha->toDateString(), 'accion' => 'atender'])
             ->with('status', "Atención de la cita {$cita->codigo} registrada. La cita quedó Atendida.");
     }
 }

@@ -2,7 +2,7 @@
 @php
     $volver = ($volverCita ?? null)
         ? route('atencion.create', $volverCita)
-        : (Auth::user()->tienePermiso('paciente.gestionar') ? route('pacientes.index') : route('dashboard'));
+        : route('pacientes.index', ['accion' => 'antecedentes']);
 @endphp
 <x-app-layout>
     <x-slot name="header">

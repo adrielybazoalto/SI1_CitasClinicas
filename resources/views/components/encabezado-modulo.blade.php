@@ -1,19 +1,17 @@
 {{--
     Etiqueta del módulo sobre el título de la página:
-    "P1 · SEGURIDAD Y ACCESOS • RF04 — BITÁCORA"
-    Sin parámetros, la deduce de la ruta actual con config/menu.php.
-    También se puede indicar a mano: <x-encabezado-modulo paquete="P1" titulo-paquete="Seguridad y Accesos" cu="CU01" />
+    "P1 · SEGURIDAD Y ACCESOS • CU24 — CONSULTAR BITÁCORA"
+    Sin parámetros, la deduce de la ruta y de ?accion (App\Support\MenuModulos::actual()),
+    igual que el ítem resaltado del menú. También se puede indicar a mano:
+    <x-encabezado-modulo paquete="P1" titulo-paquete="Seguridad y Accesos" cu="CU01" />
 --}}
 @props(['paquete' => null, 'tituloPaquete' => null, 'cu' => null, 'tituloCu' => null])
 @php
-    if ($paquete === null) {
-        $actual = \App\Support\MenuModulos::actual();
-        if ($actual) {
-            $paquete = $actual['paquete']['paquete'];
-            $tituloPaquete = $actual['paquete']['titulo'];
-            $cu = str_replace(' · ', '·', $actual['item']['cu']);
-            $tituloCu = $actual['item']['titulo'];
-        }
+    if ($paquete === null && ($actual = \App\Support\MenuModulos::actual())) {
+        $paquete = $actual['paquete']['paquete'];
+        $tituloPaquete = $actual['paquete']['titulo'];
+        $cu = $actual['item']['cu'] ?? null;
+        $tituloCu = $actual['item']['titulo'] ?? null;
     }
 @endphp
 @if ($paquete)

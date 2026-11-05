@@ -43,7 +43,7 @@
                     @foreach ($paquete['visibles'] as $item)
                         <li>
                             @if ($item['disponible'])
-                                <a href="{{ route($item['ruta']) }}"
+                                <a href="{{ $item['url'] }}"
                                    @if ($item['actual']) aria-current="page" @endif
                                    class="flex items-start gap-3 px-3 py-2 rounded-xl text-sm transition-colors
                                           {{ $item['actual'] ? 'bg-purple-100 text-purple-900 font-semibold' : 'text-gray-700 hover:bg-purple-50' }}">

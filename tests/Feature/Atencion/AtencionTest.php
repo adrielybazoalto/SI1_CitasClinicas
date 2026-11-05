@@ -137,7 +137,7 @@ class AtencionTest extends TestCase
     {
         $this->actingAs($this->usuarioPerez)
             ->post(route('atencion.store', $this->confirmada), $this->datos())
-            ->assertRedirect(route('agenda.index', ['fecha' => self::HOY]))
+            ->assertRedirect(route('agenda.index', ['fecha' => self::HOY, 'accion' => 'atender']))
             ->assertSessionHas('status');
 
         $this->assertDatabaseHas('atencion', [

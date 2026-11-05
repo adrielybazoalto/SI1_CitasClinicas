@@ -37,6 +37,10 @@ Si dos fuentes se contradicen, gana el PDF. Avísale a la usuaria en vez de deci
 - Subir `.env`, contraseñas o claves al repositorio.
 - Hacer `git push`, merge a `main` o cualquier acción destructiva **sin preguntar antes**.
 
+### Menú: un ítem por caso de uso
+
+`config/menu.php` define un ítem por CU (CU24 = Consultar bitácora). Cuando dos CU comparten pantalla, el ítem usa `?accion=...`, que solo filtra y muestra un aviso (`<x-aviso-modulo>`); no se crean pantallas duplicadas. `App\Support\MenuModulos::actual()` decide el CU actual para el menú y para `<x-encabezado-modulo>`.
+
 ### Rama de trabajo
 
 Todo se trabaja y se commitea en la rama **`amalia`** (decisión de la usuaria, 04/11). No crear ramas por paquete.
@@ -54,7 +58,7 @@ Todo se trabaja y se commitea en la rama **`amalia`** (decisión de la usuaria, 
 
 | Paquete | Casos de uso | Carpetas del código |
 |---|---|---|
-| **P1 Seguridad y Accesos** | CU01, CU02, CU03 | `Controllers/Seguridad`, `Controllers/Auth`, `views/seguridad`, `views/auth` |
+| **P1 Seguridad y Accesos** | CU01, CU02, CU03, CU24 | `Controllers/Seguridad`, `Controllers/Auth`, `views/seguridad`, `views/auth` |
 | **P2 Gestión de Pacientes** | CU04, CU05, CU06 | `Controllers/Pacientes`, `views/pacientes` |
 | **P3 Oferta Médica** | CU07, CU08, CU09, CU10, CU11 | `Controllers/Oferta`, `views/oferta` |
 | **P4 Gestión de Citas** | CU12, CU13, CU14, CU15, CU16, CU17 (+ voz RNF20) | `Controllers/Citas`, `views/citas` |
@@ -253,7 +257,7 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 - [x] Validaciones: fecha de inicio ≤ fecha de fin; si no hay resultados, mostrar un mensaje.
 - [x] Las consultas van en `ReporteService`, agrupadas en la base de datos (`groupBy`), sin cálculos en las vistas.
 
-### P1 · Bitácora (RF04)
+### P1 · CU24 Consultar bitácora (antes RF04)
 
 - [x] `BitacoraController@index` con `permiso:bitacora.ver`: tabla paginada, solo lectura, con filtros por fecha, usuario, acción y tabla.
 - [x] Revisa que `BitacoraService` se llame en: login y logout, CRUD de usuarios, roles, pacientes, médicos y horarios, y al crear, reprogramar, cancelar y atender citas.

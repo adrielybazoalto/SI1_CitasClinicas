@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Registro de auditoría (RF04). La tabla es inmutable (trigger RNF08):
+ * Registro de auditoría (CU24 Consultar bitácora). La tabla es inmutable (trigger RNF08):
  * solo se inserta, nunca se modifica ni se borra.
  *
  * Las acciones se escriben con las constantes de esta clase (en español).

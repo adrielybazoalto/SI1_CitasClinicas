@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * RF04 · Consulta de la bitácora (solo lectura).
+ * CU24 · Consultar bitácora (solo lectura).
  *
  * Controlador liviano: recibe la petición, delega en app/Services
  * y devuelve la vista o el JSON. Sin reglas del negocio aquí.

@@ -106,7 +106,7 @@
                     @endif
 
                     @if ($programada && $usuario->tienePermiso('cita.cancelar'))
-                        <form method="POST" action="{{ route('citas.cancelar', $cita) }}" class="bg-white p-4 rounded-2xl border border-rose-200 space-y-2"
+                        <form id="cancelar" method="POST" action="{{ route('citas.cancelar', $cita) }}" class="bg-white p-4 rounded-2xl border border-rose-200 space-y-2"
                               onsubmit="const m = this.motivo_cancelacion.value.trim(); if (m.length < 5) { alert('Indique el motivo (mínimo 5 caracteres).'); return false; } return confirm('¿Cancelar la cita {{ $cita->codigo }}?')">
                             @csrf
                             @method('PATCH')

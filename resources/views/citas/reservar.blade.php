@@ -23,7 +23,7 @@
             <div>
                 <x-encabezado-modulo />
                 <h2 class="text-3xl font-bold text-gray-900 leading-tight">
-                    {{ $reprogramando ? "Reprogramar cita {$cita->codigo}" : ($puedeReservar ? 'Reservar ficha' : 'Fichas disponibles') }}
+                    {{ $reprogramando ? "Reprogramar cita {$cita->codigo}" : ($puedeReservar ? 'Programar cita' : 'Citas disponibles') }}
                 </h2>
                 <p class="text-sm text-gray-500">
                     @if ($reprogramando)
@@ -39,6 +39,7 @@
 
     <div class="py-6 sm:py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+            <x-aviso-modulo />
             @include('citas._alertas')
 
             @if ($reprogramando)

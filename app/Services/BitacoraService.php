@@ -13,7 +13,7 @@ use Throwable;
 
 /**
  * Escribe en la tabla bitacora: registrar(accion, tabla, id, detalle).
- * Consulta de solo lectura (RF04): listar(filtros). La tabla es inmutable (trigger RNF08).
+ * Consulta de solo lectura (CU24): listar(filtros). La tabla es inmutable (trigger RNF08).
  */
 class BitacoraService
 {

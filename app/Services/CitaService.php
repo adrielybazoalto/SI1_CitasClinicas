@@ -86,7 +86,7 @@ class CitaService
     /**
      * Listado de citas con filtros. El paciente ve solo las suyas.
      *
-     * @param array{fecha?: ?string, medico?: ?int, estado?: ?string, buscar?: ?string} $filtros
+     * @param array{fecha?: ?string, medico?: ?int, estado?: ?string, estados?: array<string>, buscar?: ?string} $filtros
      */
     public function listar(User $usuario, array $filtros): LengthAwarePaginator
     {
@@ -99,6 +99,7 @@ class CitaService
             ->when(filled($filtros['fecha'] ?? null), fn ($q) => $q->whereDate('fecha', $filtros['fecha']))
             ->when(filled($filtros['medico'] ?? null), fn ($q) => $q->where('id_medico', $filtros['medico']))
             ->when(filled($filtros['estado'] ?? null), fn ($q) => $q->where('estado', $filtros['estado']))
+            ->when(! empty($filtros['estados']), fn ($q) => $q->whereIn('estado', $filtros['estados']))
             ->when(filled($filtros['buscar'] ?? null), function ($q) use ($filtros) {
                 $texto = '%'.mb_strtolower(trim($filtros['buscar'])).'%';
 

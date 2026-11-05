@@ -208,8 +208,14 @@ class PacienteTest extends TestCase
             'estado' => true,
         ]);
 
+        // CU06: el médico ve la lista para elegir al paciente, sin las acciones de CU05.
         $this->actingAs($medico)
-            ->get(route('pacientes.index'))
+            ->get(route('pacientes.index', ['accion' => 'antecedentes']))
+            ->assertOk()
+            ->assertDontSee('Nuevo paciente');
+
+        $this->actingAs($medico)
+            ->get(route('pacientes.create'))
             ->assertForbidden();
 
         $this->actingAs($medico)

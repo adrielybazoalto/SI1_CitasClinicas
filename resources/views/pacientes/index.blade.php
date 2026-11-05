@@ -1,3 +1,8 @@
+@php
+    // CU06: el médico y la recepción llegan con ?accion=antecedentes; solo quien gestiona pacientes ve las acciones de CU05.
+    $gestiona = Auth::user()->tienePermiso('paciente.gestionar');
+    $modoAntecedentes = request('accion') === 'antecedentes';
+@endphp
 {{-- CU05 · Gestionar pacientes: listado, búsqueda por CI/apellidos, estado y baja lógica --}}
 <x-app-layout>
     <x-slot name="header">
@@ -7,6 +12,7 @@
                 <h2 class="text-3xl font-bold text-gray-900 leading-tight">Pacientes</h2>
                 <p class="text-sm text-gray-500 mt-0.5">Registro, búsqueda y gestión de pacientes y sus antecedentes clínicos</p>
             </div>
+            @if ($gestiona && ! $modoAntecedentes)
             <a href="{{ route('pacientes.create') }}"
                class="inline-flex items-center gap-2 px-4 py-2.5 bg-purple-800 hover:bg-purple-900 active:bg-purple-950 rounded-xl font-semibold text-xs text-white uppercase tracking-wider shadow-sm hover:shadow-md hover:shadow-purple-900/20 transition-all duration-150">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -14,11 +20,13 @@
                 </svg>
                 <span>Nuevo paciente</span>
             </a>
+            @endif
         </div>
     </x-slot>
 
     <div class="py-6 sm:py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+            <x-aviso-modulo />
 
             <!-- Mensajes de estado -->
             @if (session('status'))
@@ -65,6 +73,9 @@
             <!-- Filtros -->
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-purple-100 shadow-xs">
                 <form method="GET" action="{{ route('pacientes.index') }}" class="flex flex-col sm:flex-row items-end gap-3">
+                    @if ($modoAntecedentes)
+                        <input type="hidden" name="accion" value="antecedentes">
+                    @endif
                     <div class="flex-1 w-full">
                         <x-input-label for="buscar" value="Buscar" class="text-xs font-semibold uppercase text-purple-950/80" />
                         <div class="relative mt-1">
@@ -99,7 +110,7 @@
                             Buscar
                         </button>
                         @if (request()->hasAny(['buscar', 'estado']))
-                            <a href="{{ route('pacientes.index') }}"
+                            <a href="{{ route('pacientes.index', $modoAntecedentes ? ['accion' => 'antecedentes'] : []) }}"
                                class="px-4 py-2.5 text-xs font-semibold text-purple-800 hover:text-purple-950 hover:bg-purple-50 rounded-xl transition-colors">
                                 Limpiar
                             </a>
@@ -164,6 +175,7 @@
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-right">
                                         <div class="inline-flex items-center gap-1">
+                                            @if ($gestiona && ! $modoAntecedentes)
                                             <a href="{{ route('pacientes.edit', $paciente) }}"
                                                class="p-1.5 text-purple-700 hover:text-purple-950 hover:bg-purple-100 rounded-lg transition-colors"
                                                title="Editar paciente">
@@ -171,8 +183,15 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                 </svg>
                                             </a>
+                                            @endif
 
-                                            @if (Auth::user()->tienePermiso('antecedente.gestionar'))
+                                            @if (Auth::user()->tienePermiso('antecedente.gestionar') && $modoAntecedentes)
+                                                {{-- CU06: botón destacado --}}
+                                                <a href="{{ route('pacientes.antecedentes', $paciente) }}"
+                                                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-800 hover:bg-purple-900 text-white text-xs font-semibold rounded-lg transition-colors">
+                                                    Antecedentes
+                                                </a>
+                                            @elseif (Auth::user()->tienePermiso('antecedente.gestionar'))
                                                 <a href="{{ route('pacientes.antecedentes', $paciente) }}"
                                                    class="p-1.5 text-purple-700 hover:text-purple-950 hover:bg-purple-100 rounded-lg transition-colors"
                                                    title="Antecedentes clínicos">
@@ -182,7 +201,9 @@
                                                 </a>
                                             @endif
 
-                                            @if ($paciente->estado)
+                                            @if (! $gestiona || $modoAntecedentes)
+                                                {{-- Sin acciones de CU05 --}}
+                                            @elseif ($paciente->estado)
                                                 <form method="POST" action="{{ route('pacientes.destroy', $paciente) }}"
                                                       onsubmit="return confirm('¿Desactivar al paciente {{ $paciente->codigo }}? Su historial se conservará.');">
                                                     @csrf

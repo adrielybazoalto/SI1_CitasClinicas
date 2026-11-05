@@ -8,7 +8,7 @@
         'canceladas' => 'Canceladas',
         'inasistencias' => 'Inasistencias',
     ];
-    $base = array_filter(['medico' => $medico?->id_medico, 'estado' => $estado]);
+    $base = array_filter(['medico' => $medico?->id_medico, 'estado' => $estado, 'accion' => $accion]);
     $urlDia = fn ($dia) => route('agenda.index', array_merge($base, ['fecha' => $dia->toDateString(), 'vista' => $vista]));
     $paso = $vista === 'semana' ? 7 : 1;
     $rutaAtender = \Illuminate\Support\Facades\Route::has('atencion.create');
@@ -39,6 +39,7 @@
 
     <div class="py-6 sm:py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+            <x-aviso-modulo />
             @include('citas._alertas')
 
             @if ($errors->any())
@@ -48,6 +49,9 @@
             <!-- Filtros -->
             <form method="GET" action="{{ route('agenda.index') }}" id="form-agenda" class="bg-white p-4 sm:p-5 rounded-2xl border border-purple-100 shadow-xs">
                 <input type="hidden" name="vista" value="{{ $vista }}">
+                @if ($accion)
+                    <input type="hidden" name="accion" value="{{ $accion }}">
+                @endif
                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
                     @unless ($esMedico)
                         <div class="sm:col-span-4">

@@ -1,4 +1,4 @@
-{{-- RF04 · Consulta de la bitácora (solo lectura; la tabla es inmutable por el trigger RNF08) --}}
+{{-- CU24 · Consultar bitácora (solo lectura; la tabla es inmutable por el trigger RNF08) --}}
 @php
     $claseCampo = 'mt-1 block w-full px-3 py-2.5 bg-white border border-purple-200 rounded-xl text-sm text-gray-800 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20';
     $etiqueta = 'text-xs font-semibold text-gray-600';
@@ -6,17 +6,9 @@
 @endphp
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-            <div>
-                <x-encabezado-modulo />
-                <h2 class="text-3xl font-bold text-gray-900 leading-tight">Bitácora</h2>
-                <p class="text-sm text-gray-500 mt-0.5">Registro de las operaciones del sistema · solo lectura</p>
-            </div>
-            @if (Auth::user()->tienePermiso('reporte.generar'))
-                <a href="{{ route('reportes.index', ['tipo' => 'bitacora'] + array_filter(['desde' => $filtros['desde'], 'hasta' => $filtros['hasta']])) }}"
-                   class="text-sm font-semibold text-purple-800 hover:underline">Exportar en Reportes →</a>
-            @endif
-        </div>
+        <x-encabezado-modulo />
+        <h2 class="text-3xl font-bold text-gray-900 leading-tight">Bitácora</h2>
+        <p class="text-sm text-gray-500 mt-0.5">Registro de las operaciones del sistema · solo lectura</p>
     </x-slot>
 
     <div class="py-6 sm:py-8">

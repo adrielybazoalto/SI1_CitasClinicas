@@ -22,6 +22,9 @@ use Illuminate\View\View;
  */
 class CitaController extends Controller
 {
+    /** ?accion que llega desde el menú: CU15, CU16 y CU17 comparten esta pantalla. */
+    private const ACCIONES = ['reprogramar', 'cancelar', 'asistencia'];
+
     public function __construct(private CitaService $servicio)
     {
     }
@@ -29,6 +32,8 @@ class CitaController extends Controller
     /** Listado de citas con filtros (el paciente ve solo las suyas). */
     public function index(Request $request): View
     {
+        $accion = in_array($request->query('accion'), self::ACCIONES, true) ? $request->query('accion') : null;
+
         $filtros = [
             'fecha' => $request->query('fecha'),
             'medico' => $request->integer('medico') ?: null,
@@ -36,8 +41,17 @@ class CitaController extends Controller
             'buscar' => $request->query('buscar'),
         ];
 
+        // Una sola pantalla para CU15, CU16 y CU17: ?accion solo fija filtros.
+        if ($accion === 'asistencia') {
+            $filtros['fecha'] = now()->toDateString();
+            $filtros['estados'] = CitaEstadoService::ACTIVOS;
+        } elseif ($accion !== null) {
+            $filtros['estados'] = [CitaEstadoService::PROGRAMADA];
+        }
+
         return view('citas.index', [
             'citas' => $this->servicio->listar($request->user(), $filtros),
+            'accion' => $accion,
             'filtros' => $filtros,
             'medicos' => $this->servicio->datosReserva()['medicos'],
             'estados' => array_keys(CitaEstadoService::TRANSICIONES),

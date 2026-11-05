@@ -16,7 +16,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 4v16m8-8H4"/>
                     </svg>
-                    <span>{{ $usuario->tienePermiso('cita.programar') ? 'Reservar ficha' : 'Ver fichas' }}</span>
+                    <span>{{ $usuario->tienePermiso('cita.programar') ? 'Programar cita' : 'Citas disponibles' }}</span>
                 </a>
             @endif
         </div>
@@ -24,10 +24,14 @@
 
     <div class="py-6 sm:py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+            <x-aviso-modulo />
             @include('citas._alertas')
 
             <!-- Filtros -->
             <form method="GET" action="{{ route('citas.index') }}" class="bg-white p-4 sm:p-5 rounded-2xl border border-purple-100 shadow-xs">
+                @if ($accion)
+                    <input type="hidden" name="accion" value="{{ $accion }}">
+                @endif
                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
                     @unless ($esPaciente)
                         <div class="sm:col-span-3">
@@ -61,7 +65,7 @@
                         <button type="submit" class="inline-flex flex-1 items-center justify-center gap-2 px-4 py-2.5 bg-purple-800 hover:bg-purple-900 rounded-xl font-semibold text-xs text-white uppercase tracking-wider transition-colors cursor-pointer">
                             Filtrar
                         </button>
-                        <a href="{{ route('citas.index') }}" class="inline-flex items-center justify-center px-3 py-2.5 text-xs font-semibold text-purple-800 hover:text-purple-950 hover:bg-purple-50 rounded-xl transition-colors">Limpiar</a>
+                        <a href="{{ route('citas.index', $accion ? ['accion' => $accion] : []) }}" class="inline-flex items-center justify-center px-3 py-2.5 text-xs font-semibold text-purple-800 hover:text-purple-950 hover:bg-purple-50 rounded-xl transition-colors">Limpiar</a>
                     </div>
                 </div>
             </form>
@@ -108,7 +112,29 @@
                                     <td class="px-4 sm:px-6 py-4 whitespace-nowrap">@include('citas._estado', ['estado' => $cita->estado])</td>
                                     <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
                                         <div class="inline-flex items-center gap-1">
-                                            @if ($cita->estado === 'Programada' && $cita->fecha->isToday() && $usuario->tienePermiso('cita.asistencia'))
+                                            @php $destacado = 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer'; @endphp
+                                            @if ($accion === 'reprogramar' && $cita->estado === 'Programada' && $usuario->tienePermiso('cita.reprogramar'))
+                                                {{-- CU15 --}}
+                                                <a href="{{ route('citas.reprogramar', $cita) }}" class="{{ $destacado }} bg-purple-800 hover:bg-purple-900 text-white">Reprogramar</a>
+                                            @elseif ($accion === 'cancelar' && $cita->estado === 'Programada' && $usuario->tienePermiso('cita.cancelar'))
+                                                {{-- CU16: el motivo se pide en el detalle de la cita --}}
+                                                <a href="{{ route('citas.show', $cita) }}#cancelar" class="{{ $destacado }} bg-rose-600 hover:bg-rose-700 text-white">Cancelar</a>
+                                            @elseif ($accion === 'asistencia' && $usuario->tienePermiso('cita.asistencia'))
+                                                {{-- CU17 --}}
+                                                @if ($cita->estado === 'Programada')
+                                                    <form method="POST" action="{{ route('citas.llegada', $cita) }}">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <button type="submit" class="{{ $destacado }} bg-sky-600 hover:bg-sky-700 text-white">Registrar llegada</button>
+                                                    </form>
+                                                @endif
+                                                <form method="POST" action="{{ route('citas.inasistencia', $cita) }}"
+                                                      onsubmit="return confirm('¿Registrar la inasistencia de la cita {{ $cita->codigo }}?');">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="{{ $destacado }} bg-amber-500 hover:bg-amber-600 text-white">Inasistencia</button>
+                                                </form>
+                                            @elseif ($cita->estado === 'Programada' && $cita->fecha->isToday() && $usuario->tienePermiso('cita.asistencia'))
                                                 <form method="POST" action="{{ route('citas.llegada', $cita) }}">
                                                     @csrf
                                                     @method('PATCH')

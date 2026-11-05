@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
- * Paquete 6 · CU23 Generar reportes y RF04 Consulta de bitácora.
+ * Paquete 6 · CU23 Generar reportes (la bitácora es CU24: tests/Feature/Seguridad/BitacoraTest.php).
  * Usa los datos de demostración (citas relativas a "hoy" = 11/11/2026 10:00).
  */
 class ReporteTest extends TestCase
@@ -149,7 +149,7 @@ class ReporteTest extends TestCase
             ->assertHeader('content-type', 'application/pdf');
     }
 
-    public function test_bitacora_e_ingresos_son_solo_del_administrador(): void
+    public function test_ingresos_es_solo_del_administrador(): void
     {
         $this->actingAs($this->recepcion())
             ->get(route('reportes.index', $this->rango(['tipo' => 'ingresos'])))
@@ -170,30 +170,5 @@ class ReporteTest extends TestCase
         $this->actingAs(User::where('username', 'cperez')->firstOrFail())
             ->get(route('reportes.index'))
             ->assertForbidden();
-    }
-
-    /* ---------------- RF04 · Bitácora ---------------- */
-
-    public function test_el_administrador_consulta_la_bitacora_con_filtros(): void
-    {
-        $this->actingAs($this->admin())
-            ->get(route('bitacora.index', ['accion' => 'PROGRAMAR_CITA']))
-            ->assertOk()
-            ->assertSee('PROGRAMAR_CITA')
-            ->assertDontSee('EXPORTAR_REPORTE');
-    }
-
-    public function test_la_recepcionista_no_ve_la_bitacora(): void
-    {
-        $this->actingAs($this->recepcion())
-            ->get(route('bitacora.index'))
-            ->assertForbidden();
-    }
-
-    public function test_la_bitacora_es_de_solo_lectura(): void
-    {
-        $this->assertFalse(collect(app('router')->getRoutes())->contains(
-            fn ($ruta) => str_starts_with($ruta->uri(), 'seguridad/bitacora') && array_diff($ruta->methods(), ['GET', 'HEAD']) !== []
-        ));
     }
 }

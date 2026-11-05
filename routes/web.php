@@ -66,16 +66,20 @@ Route::middleware('auth')->group(function () {
             Route::put('/{rol}/permisos', 'actualizarPermisos')->name('permisos.update');
         });
 
-    // Seguridad · RF04 Consulta de bitácora (solo lectura)
+    // Seguridad · CU24 Consultar bitácora (solo lectura)
     Route::get('/seguridad/bitacora', [BitacoraController::class, 'index'])
         ->middleware('permiso:bitacora.ver')
         ->name('bitacora.index');
 
     // Pacientes · CU05 Gestionar pacientes
+    // CU06: la lista también la usan quienes solo gestionan antecedentes (médico), con ?accion=antecedentes.
+    Route::get('/pacientes', [PacienteController::class, 'index'])
+        ->middleware('permiso:paciente.gestionar,antecedente.gestionar')
+        ->name('pacientes.index');
+
     Route::prefix('pacientes')->name('pacientes.')
         ->middleware('permiso:paciente.gestionar')
         ->controller(PacienteController::class)->group(function () {
-            Route::get('/', 'index')->name('index');
             Route::get('/nuevo', 'create')->name('create');
             Route::post('/', 'store')->name('store');
             Route::get('/{paciente}/editar', 'edit')->name('edit');

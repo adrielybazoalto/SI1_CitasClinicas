@@ -608,7 +608,7 @@ class OfertaMedicaTest extends TestCase
         // Menú lateral por paquetes: P3 con sus casos de uso.
         $response->assertSee('P3');
         $response->assertSee(route('especialidades.index'), false);
-        $response->assertSee('Horarios de atención');
+        $response->assertSee('Gestionar horarios (CU09)');
     }
 
     public function test_especialidad_index_filtra_por_estado(): void
