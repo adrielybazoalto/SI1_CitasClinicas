@@ -58,6 +58,9 @@ class Bitacora extends Model
     public const MODIFICAR_HORARIO = 'MODIFICAR_HORARIO';
     public const ACTIVAR_HORARIO = 'ACTIVAR_HORARIO';
     public const DESACTIVAR_HORARIO = 'DESACTIVAR_HORARIO';
+    public const ACTUALIZAR_TARIFA = 'ACTUALIZAR_TARIFA';
+    public const REGISTRAR_INDISPONIBILIDAD = 'REGISTRAR_INDISPONIBILIDAD';
+    public const REUBICAR_CITA = 'REUBICAR_CITA';
 
     // P4 · Citas
     public const PROGRAMAR_CITA = 'PROGRAMAR_CITA';
@@ -67,8 +70,20 @@ class Bitacora extends Model
     public const REGISTRAR_INASISTENCIA = 'REGISTRAR_INASISTENCIA';
     public const INASISTENCIA_AUTOMATICA = 'INASISTENCIA_AUTOMATICA';
 
-    // P5 · Atención y P6 · Reportes
+    public const PAGO_EN_LINEA = 'PAGO_EN_LINEA';
+    public const CANCELACION_PAGO_VENCIDO = 'CANCELACION_PAGO_VENCIDO';
+
+    // P2 · Perfil del paciente
+    public const ACTUALIZAR_PERFIL = 'ACTUALIZAR_PERFIL';
+
+    // P5 · Atención
     public const REGISTRAR_ATENCION = 'REGISTRAR_ATENCION';
+
+    // P6 · Caja, cobros y reportes
+    public const ABRIR_CAJA = 'ABRIR_CAJA';
+    public const CERRAR_CAJA = 'CERRAR_CAJA';
+    public const COBRAR_CITA = 'COBRAR_CITA';
+    public const REEMBOLSAR_CITA = 'REEMBOLSAR_CITA';
     public const EXPORTAR_REPORTE = 'EXPORTAR_REPORTE';
 
     /** Nombre antiguo (registros ya guardados) => acción en español. */
@@ -110,9 +125,9 @@ class Bitacora extends Model
         'CITA_INASISTENCIA_AUTO' => self::INASISTENCIA_AUTOMATICA,
         'ATENCION_REGISTRADA' => self::REGISTRAR_ATENCION,
         'REPORTE_EXPORTADO' => self::EXPORTAR_REPORTE,
-        'CAJA_ABIERTA' => 'ABRIR_CAJA',
-        'TARIFA_ACTUALIZADA' => 'ACTUALIZAR_TARIFA',
-        'INDISPONIBILIDAD_REGISTRADA' => 'REGISTRAR_INDISPONIBILIDAD',
+        'CAJA_ABIERTA' => self::ABRIR_CAJA,
+        'TARIFA_ACTUALIZADA' => self::ACTUALIZAR_TARIFA,
+        'INDISPONIBILIDAD_REGISTRADA' => self::REGISTRAR_INDISPONIBILIDAD,
         'MIGRACION' => 'CAMBIO_ESQUEMA',
     ];
 

@@ -239,6 +239,22 @@ class CitaTest extends TestCase
 
     /* ---------------- CU13 · Programar cita ---------------- */
 
+    /** RN22: la cita guarda el precio vigente al reservar; un cambio posterior no la afecta. */
+    public function test_la_cita_guarda_la_tarifa_vigente_al_reservar(): void
+    {
+        \App\Models\Tarifa::create(['id_especialidad' => $this->especialidad->id_especialidad, 'monto' => 100, 'vigente_desde' => '2026-01-01']);
+
+        $this->actingAs($this->recepcion)->post(route('citas.store'), $this->datosReserva($this->crearPaciente()));
+        $cita = Cita::firstOrFail();
+        $this->assertSame('100.00', $cita->monto);
+
+        app(\App\Services\TarifaService::class)->registrar(
+            ['id_especialidad' => $this->especialidad->id_especialidad, 'monto' => 150, 'vigente_desde' => '2026-11-13'],
+            $this->administrador(),
+        );
+        $this->assertSame('100.00', $cita->fresh()->monto);
+    }
+
     public function test_programa_cita_en_horario_disponible(): void
     {
         $paciente = $this->crearPaciente();

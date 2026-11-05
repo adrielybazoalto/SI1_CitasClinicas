@@ -78,7 +78,7 @@ Un paquete **nunca** llama a otro que esté por encima de él en esta lista. Las
 | P2 | CU05, CU06 | 1 | ✅ Hecho |
 | P2 | CU04 | 2 | ⬜ Vacío (`PerfilController`) |
 | P3 | CU07, CU08, CU09 | 1 | ✅ Hecho |
-| P3 | CU10, CU11 | 2 | ⬜ Vacíos (`IndisponibilidadController`, `TarifaController`) |
+| P3 | CU10, CU11 | 2 | ✅ CU11 hecho (04/11) · ⬜ CU10 |
 | P4 | CU12, CU13, CU15, CU16, CU17 | 1 | ✅ Hecho en la rama `adriely` (falta llevarlo a `main`) |
 | P4 | CU14 + voz | 2 | ⬜ Vacíos (`PagoController`, `PayPalService`) |
 | P5 | CU20, CU21, CU22 | 1 | ✅ Hecho en `amalia` (04/11) |
@@ -268,10 +268,10 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 ## FASE 2 — Ciclo 2
 
 ### P3 · CU11 Gestionar tarifario
-- [ ] `TarifaController` con `permiso:tarifa.gestionar`: lista de especialidades con su precio vigente.
-- [ ] Nuevo precio: monto > 0 y `vigente_desde ≥ hoy`. En la misma transacción se cierra la tarifa anterior (`vigente_hasta = nuevo.vigente_desde − 1 día`).
-- [ ] Vista "Historial de precios" de cada especialidad.
-- [ ] **RN22:** `CitaService::programar` guarda en `cita.monto` la tarifa vigente al momento de reservar. Las citas ya reservadas conservan su precio.
+- [x] `TarifaController` con `permiso:tarifa.gestionar`: lista de especialidades con su precio vigente.
+- [x] Nuevo precio: monto > 0 y `vigente_desde ≥ hoy`. En la misma transacción se cierra la tarifa anterior (`vigente_hasta = nuevo.vigente_desde − 1 día`).
+- [x] Vista "Historial de precios" de cada especialidad.
+- [x] **RN22:** `CitaService::programar` guarda en `cita.monto` la tarifa vigente al momento de reservar. Las citas ya reservadas conservan su precio.
 
 ### P6 · CU18 Gestionar caja
 - [ ] `CajaService::abrir(usuario, monto_inicial)`: una sola caja ABIERTA por usuario (índice `ux_caja_abierta`). Si ya tiene una abierta, se muestra esa.

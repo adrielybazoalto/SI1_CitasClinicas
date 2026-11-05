@@ -9,6 +9,7 @@ use App\Http\Controllers\Citas\FichaController;
 use App\Http\Controllers\Oferta\EspecialidadController;
 use App\Http\Controllers\Oferta\HorarioController;
 use App\Http\Controllers\Oferta\MedicoController;
+use App\Http\Controllers\Oferta\TarifaController;
 use App\Http\Controllers\Pacientes\AntecedenteController;
 use App\Http\Controllers\Pacientes\PacienteController;
 use App\Http\Controllers\ProfileController;
@@ -133,7 +134,16 @@ Route::middleware('auth')->group(function () {
             Route::patch('/{horario}/estado', 'cambiarEstado')->name('estado');
         });
 
-    // Oferta médica (CU10, CU11 ciclo 2)
+    // Oferta médica · CU11 Gestionar tarifario
+    Route::prefix('oferta/tarifas')->name('tarifas.')
+        ->middleware('permiso:tarifa.gestionar')
+        ->controller(TarifaController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{especialidad}', 'show')->whereNumber('especialidad')->name('show');
+        });
+
+    // Oferta médica (CU10 ciclo 2)
 
     // Citas · CU12 Consultar fichas disponibles
     Route::prefix('citas/fichas')->name('fichas.')

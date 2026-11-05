@@ -48,6 +48,7 @@ class CitaService
         private CodigoService $codigos,
         private NotificacionService $notificaciones,
         private BitacoraService $bitacora,
+        private TarifaService $tarifas,
     ) {
     }
 
@@ -210,6 +211,8 @@ class CitaService
                 'motivo' => $datos['motivo'] ?? null,
                 'estado' => CitaEstadoService::PROGRAMADA,
                 'estado_pago' => 'Pendiente',
+                // RN22: la cita guarda el precio vigente al reservar; un cambio posterior de tarifa no la afecta.
+                'monto' => $this->tarifas->vigenteEn($idEspecialidad, CarbonImmutable::today())?->monto,
                 'veces_reprogramada' => 0,
             ]);
 
