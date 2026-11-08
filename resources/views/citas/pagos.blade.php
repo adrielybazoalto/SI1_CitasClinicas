@@ -10,6 +10,9 @@
     <div class="py-6 sm:py-8">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
             @include('citas._alertas')
+            @if ($supervision)
+                <p class="text-sm text-gray-600 bg-white border border-purple-100 rounded-xl p-3.5">Vista de supervisión: reservas en línea de todos los pacientes. El pago lo realiza cada paciente desde su cuenta.</p>
+            @endif
 
             @forelse ($citas as $cita)
                 @php
@@ -19,6 +22,9 @@
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-purple-100 flex flex-wrap items-center justify-between gap-4">
                     <div>
                         <p class="font-bold text-gray-900">{{ $cita->fecha->format('d/m/Y') }} · {{ $cita->hora_inicio_corta }} · <span class="font-mono">{{ $cita->codigo }}</span></p>
+                        @if ($supervision)
+                            <p class="text-sm font-semibold text-purple-950">{{ $cita->paciente?->apellidos }}, {{ $cita->paciente?->nombres }} <span class="font-normal text-gray-400">· CI {{ $cita->paciente?->ci }}</span></p>
+                        @endif
                         <p class="text-sm text-gray-600">{{ ucfirst($cita->especialidad?->nombre) }} · {{ $cita->medico?->nombre_completo }}</p>
                         <p class="text-sm font-semibold mt-1 {{ $cita->estado_pago === 'Pagado' ? 'text-emerald-700' : 'text-amber-700' }}">
                             Bs {{ number_format((float) $cita->monto, 2, ',', '.') }} · {{ $cita->estado_pago }}
@@ -27,14 +33,14 @@
                             @endif
                         </p>
                     </div>
-                    @if ($pendiente)
+                    @if ($pendiente && ! $supervision)
                         <a href="{{ route('pagos.show', $cita) }}" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-xl font-semibold">Pagar ahora</a>
                     @elseif ($comprobante)
                         <a href="{{ route('pagos.comprobante', $cita) }}" class="px-4 py-2.5 border border-purple-300 text-purple-800 hover:bg-purple-50 text-sm rounded-xl font-semibold">Comprobante N.º {{ $comprobante->numero }} (PDF)</a>
                     @endif
                 </div>
             @empty
-                <div class="bg-white p-10 rounded-2xl shadow-sm border border-purple-100 text-center text-gray-500">No tiene citas con pagos pendientes ni pagos recientes.</div>
+                <div class="bg-white p-10 rounded-2xl shadow-sm border border-purple-100 text-center text-gray-500">{{ $supervision ? 'No hay reservas en línea con pagos pendientes ni pagos recientes.' : 'No tiene citas con pagos pendientes ni pagos recientes.' }}</div>
             @endforelse
         </div>
     </div>

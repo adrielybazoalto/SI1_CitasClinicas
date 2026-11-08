@@ -29,6 +29,10 @@ if [ -n "$APP_KEY" ]; then
     php artisan view:cache
 fi
 
+# Temporizadores (pago vencido, inasistencias, recordatorios): Render gratis no tiene cron.
+echo "-> Iniciando el planificador de tareas en segundo plano..."
+su -s /bin/sh www-data -c "php artisan schedule:work" > /var/www/html/storage/logs/schedule.log 2>&1 &
+
 # Iniciar PHP-FPM en segundo plano
 echo "-> Iniciando PHP-FPM en segundo plano..."
 php-fpm -D

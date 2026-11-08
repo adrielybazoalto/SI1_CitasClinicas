@@ -56,14 +56,8 @@ class SeguridadSeeder extends Seeder
 
     /** Permisos iniciales por rol (misma matriz que los datos de Supabase). */
     private const ROLES = [
-        'Administrador' => ['Configura y supervisa el sistema', [
-            'usuario.gestionar', 'rol.gestionar', 'bitacora.ver', 'paciente.gestionar',
-            'antecedente.gestionar', 'especialidad.gestionar', 'medico.gestionar',
-            'horario.gestionar', 'indisponibilidad.registrar', 'tarifa.gestionar',
-            'cita.consultar', 'cita.programar', 'cita.reprogramar', 'cita.cancelar',
-            'cita.asistencia', 'caja.gestionar', 'caja.cobrar', 'agenda.consultar',
-            'historial.consultar', 'reporte.generar',
-        ]],
+        // El Administrador supervisa todo: tiene los 24 CU en el menú (ver run()).
+        'Administrador' => ['Configura y supervisa el sistema', []],
         'Recepcionista' => ['Gestiona pacientes, citas y caja', [
             'paciente.gestionar', 'antecedente.gestionar', 'indisponibilidad.registrar',
             'cita.consultar', 'cita.programar', 'cita.reprogramar', 'cita.cancelar',
@@ -94,10 +88,10 @@ class SeguridadSeeder extends Seeder
             }
         }
 
-        // El Administrador siempre conserva la gestión de roles (CU03).
+        // El Administrador ve todos los CU: siempre tiene todos los permisos.
         $admin = Rol::where('nombre', Rol::ADMINISTRADOR)->first();
         $admin->permisos()->syncWithoutDetaching(
-            Permiso::where('codigo', Permiso::GESTION_ROLES)->pluck('id_permiso')
+            Permiso::whereIn('codigo', array_keys(self::PERMISOS))->pluck('id_permiso')
         );
 
         $this->crearAdministrador($admin);

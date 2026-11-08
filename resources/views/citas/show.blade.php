@@ -88,7 +88,7 @@
                         </a>
                     @endif
 
-                    @if (app(\App\Services\PagoService::class)->cobrable($cita) && $usuario->tienePermiso('pago.en_linea') && ! app(\App\Services\PagoService::class)->vencida($cita))
+                    @if (app(\App\Services\PagoService::class)->cobrable($cita) && $usuario->tienePermiso('pago.en_linea') && app(\App\Services\CitaService::class)->pacienteDe($usuario)?->id_paciente === $cita->id_paciente && ! app(\App\Services\PagoService::class)->vencida($cita))
                         {{-- CU14: el paciente paga su cita en línea --}}
                         <a href="{{ route('pagos.show', $cita) }}"
                            class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-semibold text-xs text-white uppercase tracking-wider transition-colors">

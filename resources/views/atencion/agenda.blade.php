@@ -44,6 +44,9 @@
             {{-- RNF20 · CU20: dictado de médico, fecha y estado (no envía el filtro solo) --}}
             <x-voz :campos="array_filter(['medico' => $esMedico ? null : 'medico', 'fecha' => 'fecha', 'estado' => 'estado'])" />
             @include('citas._alertas')
+            @if ($accion === 'atender' && ! $esMedico)
+                <p class="text-sm text-gray-600 bg-white border border-purple-100 rounded-xl p-3.5">Vista de supervisión: la atención la registra el médico de cada cita. Puede consultar el detalle en «Consultar historial» (CU22).</p>
+            @endif
 
             @if ($errors->any())
                 <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">{{ $errors->first() }}</div>

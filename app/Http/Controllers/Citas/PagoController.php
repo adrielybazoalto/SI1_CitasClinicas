@@ -31,21 +31,26 @@ class PagoController extends Controller
     ) {
     }
 
-    /** Citas del paciente pendientes de pago y pagos ya hechos. */
+    /**
+     * Citas del paciente pendientes de pago y pagos ya hechos.
+     * El administrador entra en modo supervisión: ve las reservas en línea
+     * de todos los pacientes, sin poder pagar por ellos.
+     */
     public function index(Request $request): View
     {
         $paciente = $this->citas->pacienteDe($request->user());
-        abort_unless($paciente, 403, 'Su cuenta no está vinculada a un paciente.');
+        $supervision = ! $paciente && $this->supervisa($request);
+        abort_unless($paciente || $supervision, 403, 'Su cuenta no está vinculada a un paciente.');
 
         $citas = Cita::query()
-            ->with(['medico:id_medico,nombres,apellidos', 'especialidad:id_especialidad,nombre', 'pagos.comprobante'])
-            ->where('id_paciente', $paciente->id_paciente)
+            ->with(['paciente:id_paciente,nombres,apellidos,ci', 'medico:id_medico,nombres,apellidos', 'especialidad:id_especialidad,nombre', 'pagos.comprobante'])
+            ->when($paciente, fn ($q) => $q->where('id_paciente', $paciente->id_paciente), fn ($q) => $q->where('canal', 'LINEA'))
             ->where('monto', '>', 0)
             ->whereIn('estado', ['Programada', 'Confirmada'])
             ->orderBy('fecha')->orderBy('hora_inicio')
             ->get();
 
-        return view('citas.pagos', ['citas' => $citas]);
+        return view('citas.pagos', ['citas' => $citas, 'supervision' => $supervision]);
     }
 
     /** Pantalla de pago: contador de la retención, PayPal y QR. */
@@ -125,7 +130,7 @@ class PagoController extends Controller
     /** Comprobante en PDF del pago del propio paciente. */
     public function comprobante(Request $request, Cita $cita): Response
     {
-        $this->asegurarPropia($request, $cita);
+        abort_unless($this->supervisa($request) || $this->citas->pacienteDe($request->user())?->id_paciente === $cita->id_paciente, 403);
         $pago = Pago::query()->where('id_cita', $cita->id_cita)->where('tipo', 'COBRO')->has('comprobante')->latest('fecha_hora')->firstOrFail();
 
         return Pdf::loadView('pdf.comprobante', ['pago' => $pago->load(['comprobante', 'cita.paciente', 'cita.medico', 'cita.especialidad', 'registrador'])])
@@ -140,6 +145,12 @@ class PagoController extends Controller
         return redirect()->route('pagos.index')->with('status', sprintf(
             'Pago confirmado. Comprobante N.º %d%s.', $pago->comprobante->numero, $enviado ? ' enviado a su correo' : '',
         ));
+    }
+
+    /** El administrador supervisa los pagos en línea (solo lectura). */
+    private function supervisa(Request $request): bool
+    {
+        return (bool) $request->user()->rol?->esAdministrador();
     }
 
     private function asegurarPropia(Request $request, Cita $cita): void

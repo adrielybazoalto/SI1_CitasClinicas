@@ -53,7 +53,8 @@ class AgendaController extends Controller
             'accion' => $accion,
             'filtrosEstado' => array_keys(AtencionService::FILTROS_ESTADO),
             'verMotivo' => $this->servicio->puedeVerMotivo($usuario),
-            'puedeAtender' => $usuario->tienePermiso('atencion.registrar'),
+            // Solo el médico registra la atención; el administrador la supervisa.
+            'puedeAtender' => $esMedico && $usuario->tienePermiso('atencion.registrar'),
             'citas' => $medico && $vista === 'dia' ? $this->servicio->agendaDelDia($medico, $fecha, $estado) : collect(),
             'semana' => $medico && $vista === 'semana' ? $this->servicio->resumenSemanal($medico, $fecha) : [],
         ]);

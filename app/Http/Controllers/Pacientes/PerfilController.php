@@ -22,8 +22,14 @@ class PerfilController extends Controller
     {
     }
 
-    public function edit(Request $request): View
+    public function edit(Request $request): View|RedirectResponse
     {
+        // El administrador no tiene perfil de paciente: supervisa los perfiles desde CU05.
+        if ($request->user()->rol?->esAdministrador() && ! Paciente::query()->where('id_usuario', $request->user()->id_usuario)->exists()) {
+            return redirect()->route('pacientes.index')
+                ->with('status', 'CU04 «Mi perfil» lo usa cada paciente para su propio registro. Como administrador, consulte o edite los datos de un paciente aquí (CU05).');
+        }
+
         $paciente = $this->propio($request)->load(['antecedente']);
 
         return view('pacientes.perfil', [
