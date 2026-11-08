@@ -55,6 +55,43 @@ class MenuModulos
     }
 
     /**
+     * RNF20 · CU a los que se puede ir por voz (las intenciones están en
+     * resources/js/voz.js). CU01 (sesión) y CU21 (se atiende desde la agenda) no.
+     */
+    public const CU_VOZ = [
+        'CU02', 'CU03', 'CU04', 'CU05', 'CU06', 'CU07', 'CU08', 'CU09', 'CU10', 'CU11', 'CU12',
+        'CU13', 'CU14', 'CU15', 'CU16', 'CU17', 'CU18', 'CU19', 'CU20', 'CU22', 'CU23', 'CU24',
+    ];
+
+    /**
+     * RNF20 · ¿El usuario tiene el micrófono flotante (<x-voz-global>)? Todos
+     * los roles lo tienen; qué puede hacer con él lo deciden sus permisos.
+     */
+    public static function tieneVozGlobal(?User $usuario): bool
+    {
+        return $usuario !== null && $usuario->rol !== null;
+    }
+
+    /**
+     * RNF20 · URL de cada CU que el usuario tiene permitido, para la navegación
+     * por voz. Sale del mismo filtro de permisos que el menú (CU03): si el rol
+     * no ve el ítem, la voz tampoco lo ofrece.
+     *
+     * @param  list<string>|null  $cus  por defecto, todos los de CU_VOZ
+     * @return array<string, string> ['CU13' => url, ...]
+     */
+    public static function destinosVoz(User $usuario, ?array $cus = null): array
+    {
+        $cus ??= self::CU_VOZ;
+
+        return self::paraUsuario($usuario)
+            ->flatMap(fn (array $paquete) => $paquete['visibles'])
+            ->filter(fn (array $item) => in_array($item['cu'], $cus, true) && $item['url'])
+            ->mapWithKeys(fn (array $item) => [$item['cu'] => $item['url']])
+            ->all();
+    }
+
+    /**
      * Paquete e ítem (CU) de la pantalla actual; 'item' es null cuando solo
      * se sabe el paquete.
      *

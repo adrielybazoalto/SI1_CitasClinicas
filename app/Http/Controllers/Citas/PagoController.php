@@ -72,7 +72,7 @@ class PagoController extends Controller
             'stripePrueba' => $this->stripe->modoPrueba(),
             'stripeMoneda' => mb_strtoupper($this->stripe->moneda()),
             'stripeMonto' => $this->stripe->monto($cita),
-            'qr' => sprintf('VIDASALUD|%s|BOB|%s|%s', $cita->codigo, number_format((float) $cita->monto, 2, '.', ''), $cita->id_cita),
+            'qr' => $this->pagos->textoQr($cita),
         ]);
     }
 

@@ -49,18 +49,20 @@ class CajaController extends Controller
 
     public function cerrar(Request $request): RedirectResponse
     {
-        $datos = $request->validate([
-            'contado.EFECTIVO' => ['required', 'numeric', 'min:0'],
-            'contado.TARJETA' => ['required', 'numeric', 'min:0'],
-            'contado.TRANSFERENCIA' => ['required', 'numeric', 'min:0'],
-            'observacion' => ['nullable', 'string', 'max:300'],
-        ], [
-            'contado.*.required' => 'Ingrese el monto contado de cada método (0 si no hubo).',
-            'contado.*.min' => 'Los montos contados no pueden ser negativos.',
-        ]);
-
         $caja = $this->servicio->abierta($request->user());
         abort_unless($caja, 404, 'No tiene una caja abierta.');
+
+        // Un conteo por cada método del arqueo (Efectivo, Tarjeta y QR, más algún histórico si la caja lo tiene).
+        $reglas = ['observacion' => ['nullable', 'string', 'max:300']];
+        foreach (array_keys($this->servicio->resumen($caja)['metodos']) as $metodo) {
+            $reglas["contado.{$metodo}"] = ['required', 'numeric', 'min:0'];
+        }
+
+        $datos = $request->validate($reglas, [
+            'contado.*.required' => 'Ingrese el monto contado de cada método (0 si no hubo).',
+            'contado.*.numeric' => 'Los montos contados deben ser números.',
+            'contado.*.min' => 'Los montos contados no pueden ser negativos.',
+        ]);
 
         $caja = $this->servicio->cerrar($caja, $datos['contado'], $datos['observacion'] ?? null, $request->user());
 

@@ -27,8 +27,24 @@ class PagoService
     public const REEMBOLSO = 'REEMBOLSO';
     public const APROBADO = 'APROBADO';
 
-    public const METODOS_MOSTRADOR = ['EFECTIVO', 'TARJETA', 'TRANSFERENCIA'];
+    /** CU19 · Métodos válidos para cobrar en mostrador (08/11: QR reemplaza a Transferencia). */
+    public const METODOS_MOSTRADOR = ['EFECTIVO', 'TARJETA', 'QR'];
     public const METODOS_LINEA = ['STRIPE', 'QR'];
+
+    /** Nombre visible de cada método, incluidos los históricos que ya no se ofrecen (TRANSFERENCIA, PAYPAL). */
+    public const NOMBRES_METODO = [
+        'EFECTIVO' => 'Efectivo',
+        'TARJETA' => 'Tarjeta',
+        'QR' => 'QR',
+        'STRIPE' => 'Tarjeta (Stripe)',
+        'TRANSFERENCIA' => 'Transferencia',
+        'PAYPAL' => 'PayPal',
+    ];
+
+    public static function nombreMetodo(string $metodo): string
+    {
+        return self::NOMBRES_METODO[$metodo] ?? ucfirst(mb_strtolower($metodo));
+    }
 
     /** Candado de transacción para el número correlativo del comprobante. */
     private const CANDADO_COMPROBANTE = 4202619;
@@ -46,6 +62,12 @@ class PagoService
         return $cita->estado === CitaEstadoService::PROGRAMADA
             && $cita->estado_pago === 'Pendiente'
             && (float) $cita->monto > 0;
+    }
+
+    /** Contenido del QR de pago de una cita (el mismo en CU14 y en mostrador, CU19). */
+    public function textoQr(Cita $cita): string
+    {
+        return sprintf('VIDASALUD|%s|BOB|%s|%s', $cita->codigo, number_format((float) $cita->monto, 2, '.', ''), $cita->id_cita);
     }
 
     /**

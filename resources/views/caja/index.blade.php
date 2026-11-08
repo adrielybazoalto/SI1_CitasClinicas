@@ -3,7 +3,7 @@
     $claseCampo = 'mt-1 block w-full px-3.5 py-2.5 bg-white border border-purple-200 rounded-xl text-sm text-gray-800 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20';
     $etiqueta = 'text-xs font-semibold text-gray-600';
     $bs = fn ($m) => 'Bs '.number_format((float) $m, 2, ',', '.');
-    $nombres = ['EFECTIVO' => 'Efectivo', 'TARJETA' => 'Tarjeta', 'TRANSFERENCIA' => 'Transferencia'];
+    $nombres = \App\Services\PagoService::NOMBRES_METODO;
 @endphp
 <x-app-layout>
     <x-slot name="header">

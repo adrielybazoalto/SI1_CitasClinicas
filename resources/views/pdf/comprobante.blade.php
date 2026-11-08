@@ -47,7 +47,7 @@
         <tr><td class="e">Cita</td><td>{{ $cita->codigo }} · {{ $cita->fecha->format('d/m/Y') }} {{ $cita->hora_inicio_corta }}</td></tr>
         <tr><td class="e">Especialidad</td><td>{{ ucfirst($cita->especialidad->nombre) }}</td></tr>
         <tr><td class="e">Médico</td><td>{{ $cita->medico->nombre_completo }}</td></tr>
-        <tr><td class="e">Método de pago</td><td>{{ ucfirst(mb_strtolower($pago->metodo)) }}{{ $pago->id_transaccion ? ' · transacción '.$pago->id_transaccion : '' }}</td></tr>
+        <tr><td class="e">Método de pago</td><td>{{ \App\Services\PagoService::nombreMetodo($pago->metodo) }}{{ $pago->id_transaccion ? ' · transacción '.$pago->id_transaccion : '' }}</td></tr>
         <tr><td class="e">Cobrado por</td><td>{{ $pago->registrador?->username ?? 'Pago en línea' }}</td></tr>
         <tr class="total"><td>Total pagado</td><td>Bs {{ number_format((float) $pago->monto, 2, ',', '.') }}</td></tr>
     </table>

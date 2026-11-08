@@ -281,7 +281,7 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 ### P6 · CU19 Cobrar cita en mostrador y emitir comprobante (extiende a CU13)
 - [x] Requiere una caja abierta; si no hay, redirige a abrirla.
 - [x] Cita Programada con `estado_pago = Pendiente`. El monto es `cita.monto`.
-- [x] Métodos: EFECTIVO (monto recibido ≥ monto, con cálculo del cambio), TARJETA o TRANSFERENCIA.
+- [x] Métodos: EFECTIVO (monto recibido ≥ monto, con cálculo del cambio), TARJETA o QR (08/11: QR reemplaza a TRANSFERENCIA; los pagos históricos con TRANSFERENCIA se conservan y siguen en sus arqueos).
 - [x] En una sola transacción: `pago` (COBRO, APROBADO, `id_caja`) → `cita.estado_pago = Pagado` → `comprobante` con **número correlativo** (bloquea con `lockForUpdate` para que no se repita).
 - [x] Comprobante interno en PDF para imprimir o enviar al correo del paciente.
 - [x] Al programar una cita en mostrador (CU13, canal MOSTRADOR), se ofrece cobrarla en ese momento.

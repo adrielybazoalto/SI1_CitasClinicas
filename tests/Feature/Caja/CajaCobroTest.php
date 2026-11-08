@@ -109,7 +109,7 @@ class CajaCobroTest extends TestCase
         $this->actingAs($this->recepcion)->post(route('cobros.store', $this->cita), ['metodo' => 'EFECTIVO', 'recibido' => 200]);
 
         // Faltan Bs 10 en efectivo: sin observación no se puede cerrar.
-        $contado = ['EFECTIVO' => 340, 'TARJETA' => 0, 'TRANSFERENCIA' => 0];
+        $contado = ['EFECTIVO' => 340, 'TARJETA' => 0, 'QR' => 0];
         $this->actingAs($this->recepcion)->post(route('caja.cerrar'), ['contado' => $contado])
             ->assertSessionHasErrors('observacion');
 
@@ -157,10 +157,98 @@ class CajaCobroTest extends TestCase
             ->assertSessionHasErrors('recibido');
         $this->assertSame(0, Pago::count());
 
-        $this->actingAs($this->recepcion)->post(route('cobros.store', $this->cita), ['metodo' => 'TRANSFERENCIA']);
-        $this->actingAs($this->recepcion)->post(route('cobros.store', $this->cita), ['metodo' => 'TRANSFERENCIA'])
+        $this->actingAs($this->recepcion)->post(route('cobros.store', $this->cita), ['metodo' => 'QR', 'confirmo_qr' => '1']);
+        $this->actingAs($this->recepcion)->post(route('cobros.store', $this->cita), ['metodo' => 'QR', 'confirmo_qr' => '1'])
             ->assertSessionHasErrors('cita');
         $this->assertSame(1, Pago::count());
+    }
+
+    public function test_los_metodos_de_mostrador_son_efectivo_tarjeta_y_qr(): void
+    {
+        $this->abrirCaja();
+
+        $this->actingAs($this->recepcion)->get(route('cobros.create', $this->cita))
+            ->assertOk()
+            ->assertSee('value="EFECTIVO"', false)
+            ->assertSee('value="TARJETA"', false)
+            ->assertSee('value="QR"', false)
+            ->assertDontSee('TRANSFERENCIA')
+            ->assertDontSee('Transferencia');
+
+        $this->actingAs($this->recepcion)->post(route('cobros.store', $this->cita), ['metodo' => 'TRANSFERENCIA'])
+            ->assertSessionHasErrors(['metodo' => 'El método de pago debe ser Efectivo, Tarjeta o QR.']);
+        $this->assertSame(0, Pago::count());
+
+        $this->actingAs($this->recepcion)->post(route('cobros.store', $this->cita), ['metodo' => 'QR', 'confirmo_qr' => '1'])->assertSessionHasNoErrors();
+        $pago = Pago::firstOrFail();
+        $this->assertSame('QR', $pago->metodo);
+        $this->assertNotNull($pago->id_caja);
+
+        // El arqueo pide el conteo de los tres métodos y el QR suma en su propia fila.
+        $this->actingAs($this->recepcion)->get(route('caja.index'))
+            ->assertSee('name="contado[QR]"', false)
+            ->assertDontSee('contado[TRANSFERENCIA]', false);
+        $this->actingAs($this->recepcion)->post(route('caja.cerrar'), ['contado' => ['EFECTIVO' => 200, 'TARJETA' => 0]])
+            ->assertSessionHasErrors('contado.QR');
+        $this->actingAs($this->recepcion)->post(route('caja.cerrar'), ['contado' => ['EFECTIVO' => 200, 'TARJETA' => 0, 'QR' => 150]])
+            ->assertSessionHasNoErrors();
+        $this->assertSame('0.00', Caja::first()->diferencia);
+    }
+
+    public function test_con_qr_muestra_el_codigo_y_exige_confirmar_el_pago(): void
+    {
+        $this->abrirCaja();
+
+        // La pantalla trae el QR (mismo contenido que CU14), el monto exacto, los pasos y la casilla.
+        $this->actingAs($this->recepcion)->get(route('cobros.create', $this->cita))
+            ->assertOk()
+            ->assertSee('id="bloque-qr"', false)
+            ->assertSee('data-qr="VIDASALUD|CM-000001|BOB|150.00|'.$this->cita->id_cita.'"', false)
+            ->assertSee('Confirmo que recibí el pago por QR de Bs 150,00.')
+            ->assertSee('name="confirmo_qr"', false);
+
+        // Sin marcar la casilla no se registra el cobro.
+        $this->actingAs($this->recepcion)->post(route('cobros.store', $this->cita), ['metodo' => 'QR'])
+            ->assertSessionHasErrors(['confirmo_qr' => 'Confirme que recibió el pago por QR antes de registrar el cobro.']);
+        $this->assertSame(0, Pago::count());
+        $this->assertSame('Pendiente', $this->cita->fresh()->estado_pago);
+
+        // Efectivo y tarjeta no piden esa confirmación.
+        $this->actingAs($this->recepcion)->post(route('cobros.store', $this->cita), ['metodo' => 'TARJETA'])->assertSessionHasNoErrors();
+        $this->assertSame('Pagado', $this->cita->fresh()->estado_pago);
+    }
+
+    public function test_el_reembolso_de_un_qr_pagado_en_linea_no_entra_en_la_caja(): void
+    {
+        // Cita pagada en línea con QR (CU14): el cobro no tiene caja.
+        $this->cita->forceFill(['canal' => 'LINEA', 'estado_pago' => 'Pagado'])->save();
+        Pago::create(['id_cita' => $this->cita->id_cita, 'id_caja' => null, 'tipo' => 'COBRO', 'metodo' => 'QR',
+            'monto' => 150, 'id_transaccion' => 'QR-SIM-CM-000001', 'estado' => 'APROBADO']);
+
+        $this->abrirCaja(200);
+        $this->actingAs($this->recepcion)->patch(route('citas.cancelar', $this->cita), ['motivo_cancelacion' => 'Viaje imprevisto'])
+            ->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('pago', ['id_cita' => $this->cita->id_cita, 'tipo' => 'REEMBOLSO', 'metodo' => 'QR', 'id_caja' => null]);
+
+        // La caja solo espera su efectivo inicial: el reembolso en línea no es de ella.
+        $this->actingAs($this->recepcion)->post(route('caja.cerrar'), ['contado' => ['EFECTIVO' => 200, 'TARJETA' => 0, 'QR' => 0]])
+            ->assertSessionHasNoErrors();
+        $this->assertSame('0.00', Caja::first()->diferencia);
+        $this->assertSame(0, Pago::where('id_caja', Caja::first()->id_caja)->count());
+    }
+
+    public function test_el_arqueo_de_una_caja_antigua_conserva_la_transferencia(): void
+    {
+        $this->abrirCaja(0);
+        $caja = Caja::first();
+        // Cobro histórico, de antes de que QR reemplazara a Transferencia.
+        Pago::create(['id_cita' => $this->cita->id_cita, 'id_caja' => $caja->id_caja, 'registrado_por' => $this->recepcion->id_usuario,
+            'tipo' => 'COBRO', 'metodo' => 'TRANSFERENCIA', 'monto' => 150, 'estado' => 'APROBADO']);
+
+        $resumen = app(\App\Services\CajaService::class)->resumen($caja);
+        $this->assertSame(['EFECTIVO', 'TARJETA', 'QR', 'TRANSFERENCIA'], array_keys($resumen['metodos']));
+        $this->assertSame(150.0, $resumen['metodos']['TRANSFERENCIA']['esperado']);
+        $this->assertSame(150.0, $resumen['total_cobrado']);
     }
 
     public function test_cita_sin_tarifa_no_se_cobra(): void
@@ -185,7 +273,7 @@ class CajaCobroTest extends TestCase
         $this->assertDatabaseHas('pago', ['id_cita' => $this->cita->id_cita, 'tipo' => 'REEMBOLSO', 'metodo' => 'EFECTIVO']);
 
         // Esperado en efectivo = 200 + 150 − 150.
-        $this->actingAs($this->recepcion)->post(route('caja.cerrar'), ['contado' => ['EFECTIVO' => 200, 'TARJETA' => 0, 'TRANSFERENCIA' => 0]])
+        $this->actingAs($this->recepcion)->post(route('caja.cerrar'), ['contado' => ['EFECTIVO' => 200, 'TARJETA' => 0, 'QR' => 0]])
             ->assertSessionHasNoErrors();
         $this->assertSame('0.00', Caja::first()->diferencia);
         $this->assertSame(2, Pago::where('id_caja', Caja::first()->id_caja)->count());

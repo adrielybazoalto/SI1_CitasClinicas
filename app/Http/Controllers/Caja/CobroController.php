@@ -51,7 +51,10 @@ class CobroController extends Controller
             return redirect()->route('cobros.index')->with('error', "La cita {$cita->codigo} no se puede cobrar (estado {$cita->estado}, pago {$cita->estado_pago}).");
         }
 
-        return view('caja.cobrar', ['cita' => $cita->load(['paciente', 'medico', 'especialidad'])]);
+        return view('caja.cobrar', [
+            'cita' => $cita->load(['paciente', 'medico', 'especialidad']),
+            'qr' => $this->pagos->textoQr($cita),
+        ]);
     }
 
     public function store(Request $request, Cita $cita): RedirectResponse
@@ -59,9 +62,13 @@ class CobroController extends Controller
         $datos = $request->validate([
             'metodo' => ['required', Rule::in(PagoService::METODOS_MOSTRADOR)],
             'recibido' => ['nullable', 'required_if:metodo,EFECTIVO', 'numeric', 'min:0'],
+            // Con QR, la recepcionista confirma que vio el pago acreditado antes de registrarlo.
+            'confirmo_qr' => ['accepted_if:metodo,QR'],
         ], [
             'metodo.required' => 'Elija el método de pago.',
+            'metodo.in' => 'El método de pago debe ser Efectivo, Tarjeta o QR.',
             'recibido.required_if' => 'En efectivo, indique el monto recibido.',
+            'confirmo_qr.accepted_if' => 'Confirme que recibió el pago por QR antes de registrar el cobro.',
         ]);
 
         $resultado = $this->caja->cobrar($cita, $datos['metodo'], isset($datos['recibido']) ? (float) $datos['recibido'] : null, $request->user());

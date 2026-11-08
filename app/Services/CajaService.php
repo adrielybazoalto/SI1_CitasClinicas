@@ -66,7 +66,9 @@ class CajaService
 
     /**
      * Movimientos de la caja: cobros con id_caja y reembolsos que registró
-     * su dueño mientras estuvo abierta (se le asignan al cerrar).
+     * su dueño mientras estuvo abierta (se le asignan al cerrar). Solo se
+     * adoptan reembolsos de citas cobradas en mostrador: QR también es
+     * método en línea (CU14) y ese dinero nunca pasó por una caja.
      */
     private function movimientos(Caja $caja): Builder
     {
@@ -76,6 +78,7 @@ class CajaService
                 ->whereNull('id_caja')
                 ->where('tipo', PagoService::REEMBOLSO)
                 ->whereIn('metodo', PagoService::METODOS_MOSTRADOR)
+                ->whereHas('cita.pagos', fn ($c) => $c->where('tipo', PagoService::COBRO)->whereNotNull('id_caja'))
                 ->where('registrado_por', $caja->id_usuario)
                 ->where('fecha_hora', '>=', $caja->apertura)
                 ->when($caja->cierre, fn ($s) => $s->where('fecha_hora', '<=', $caja->cierre))));
@@ -92,8 +95,9 @@ class CajaService
         $movimientos = $this->movimientos($caja)->with(['cita:id_cita,codigo,id_paciente', 'cita.paciente:id_paciente,nombres,apellidos', 'comprobante'])
             ->orderBy('fecha_hora')->get();
 
+        // Métodos vigentes y, en cajas antiguas, los históricos que tengan movimientos (p. ej. TRANSFERENCIA).
         $metodos = [];
-        foreach (PagoService::METODOS_MOSTRADOR as $metodo) {
+        foreach (array_unique([...PagoService::METODOS_MOSTRADOR, ...$movimientos->pluck('metodo')->all()]) as $metodo) {
             $cobros = (float) $movimientos->where('metodo', $metodo)->where('tipo', PagoService::COBRO)->sum('monto');
             $reembolsos = (float) $movimientos->where('metodo', $metodo)->where('tipo', PagoService::REEMBOLSO)->sum('monto');
             $esperado = $cobros - $reembolsos + ($metodo === 'EFECTIVO' ? (float) $caja->monto_inicial : 0);
@@ -111,7 +115,7 @@ class CajaService
      * Cierra la caja con el conteo por método. La observación es
      * obligatoria si hay sobrante o faltante.
      *
-     * @param array{EFECTIVO: float, TARJETA: float, TRANSFERENCIA: float} $contado
+     * @param array<string, float> $contado monto contado por método (PagoService::METODOS_MOSTRADOR)
      * @throws ValidationException
      */
     public function cerrar(Caja $caja, array $contado, ?string $observacion, User $actor): Caja

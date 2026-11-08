@@ -1,7 +1,7 @@
 {{-- CU18 · Reporte de arqueo de caja (dompdf) --}}
 @php
     $bs = fn ($m) => 'Bs '.number_format((float) $m, 2, ',', '.');
-    $nombres = ['EFECTIVO' => 'Efectivo', 'TARJETA' => 'Tarjeta', 'TRANSFERENCIA' => 'Transferencia'];
+    $nombres = \App\Services\PagoService::NOMBRES_METODO;
 @endphp
 <!DOCTYPE html>
 <html lang="es">

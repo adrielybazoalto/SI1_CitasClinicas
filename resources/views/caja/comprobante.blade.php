@@ -19,7 +19,7 @@
                     <div><dt class="text-xs text-gray-500">CI</dt><dd class="font-semibold">{{ $cita?->paciente?->ci }}</dd></div>
                     <div><dt class="text-xs text-gray-500">Cita</dt><dd class="font-semibold">{{ $cita?->fecha->format('d/m/Y') }} {{ $cita?->hora_inicio_corta }}</dd></div>
                     <div><dt class="text-xs text-gray-500">Médico</dt><dd class="font-semibold">{{ $cita?->medico?->nombre_completo }}</dd></div>
-                    <div><dt class="text-xs text-gray-500">Método</dt><dd class="font-semibold">{{ ucfirst(mb_strtolower($pago->metodo)) }}</dd></div>
+                    <div><dt class="text-xs text-gray-500">Método</dt><dd class="font-semibold">{{ \App\Services\PagoService::nombreMetodo($pago->metodo) }}</dd></div>
                     <div><dt class="text-xs text-gray-500">Monto</dt><dd class="text-xl font-bold tabular-nums">Bs {{ number_format((float) $pago->monto, 2, ',', '.') }}</dd></div>
                 </dl>
             </div>

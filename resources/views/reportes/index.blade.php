@@ -32,6 +32,12 @@
                 <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-800">{{ $errors->first() }}</div>
             @endif
 
+            {{-- RNF20 · El micrófono flotante dicta el tipo, el rango y los filtros (nunca genera solo) --}}
+            <x-voz :campos="[
+                'tipo' => 'tipo', 'desde' => 'desde', 'hasta' => 'hasta', 'fecha' => 'fecha',
+                'medico' => 'medico', 'especialidad' => 'especialidad', 'estado' => 'estado',
+            ]" />
+
             <!-- Selector y filtros -->
             <form method="GET" action="{{ route('reportes.index') }}" id="form-reporte" class="bg-white p-4 sm:p-5 rounded-2xl border border-purple-100 shadow-xs">
                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
@@ -43,27 +49,25 @@
                             @endforeach
                         </select>
                     </div>
-                    @if ($usaRango)
-                        <div class="sm:col-span-2">
+                    {{-- Rango o fecha según el tipo; el otro queda oculto (con su valor) para que la voz pueda llenarlo --}}
+                        <div @class(['sm:col-span-2', 'hidden' => ! $usaRango])>
                             <x-input-label for="desde" value="Desde" class="{{ $etiqueta }}" />
                             <input id="desde" name="desde" type="date" required value="{{ $filtros['desde'] }}" class="{{ $claseCampo }}">
                         </div>
-                        <div class="sm:col-span-2">
+                        <div @class(['sm:col-span-2', 'hidden' => ! $usaRango])>
                             <x-input-label for="hasta" value="Hasta" class="{{ $etiqueta }}" />
                             <input id="hasta" name="hasta" type="date" required value="{{ $filtros['hasta'] }}" class="{{ $claseCampo }}">
                         </div>
-                    @else
-                        <div class="sm:col-span-4">
+                        <div @class(['sm:col-span-4', 'hidden' => $usaRango])>
                             <x-input-label for="fecha" value="Fecha" class="{{ $etiqueta }}" />
                             <input id="fecha" name="fecha" type="date" required value="{{ $filtros['fecha'] }}" class="{{ $claseCampo }}">
                         </div>
-                    @endif
                     <div class="sm:col-span-4 flex items-end">
                         <button type="submit" class="inline-flex w-full items-center justify-center px-4 py-2.5 bg-purple-800 hover:bg-purple-900 rounded-xl font-semibold text-xs text-white uppercase tracking-wider cursor-pointer">Generar</button>
                     </div>
 
-                    @unless ($sinFiltrosCita)
-                        <div class="sm:col-span-4">
+                    {{-- Filtros de cita: ocultos en los reportes que no los usan (el servidor los ignora) --}}
+                        <div @class(['sm:col-span-4', 'hidden' => $sinFiltrosCita])>
                             <x-input-label for="medico" value="Médico" class="{{ $etiqueta }}" />
                             <select id="medico" name="medico" class="{{ $claseCampo }}">
                                 <option value="">Todos</option>
@@ -72,7 +76,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="sm:col-span-4">
+                        <div @class(['sm:col-span-4', 'hidden' => $sinFiltrosCita])>
                             <x-input-label for="especialidad" value="Especialidad" class="{{ $etiqueta }}" />
                             <select id="especialidad" name="especialidad" class="{{ $claseCampo }}">
                                 <option value="">Todas</option>
@@ -81,7 +85,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="sm:col-span-4">
+                        <div @class(['sm:col-span-4', 'hidden' => $sinFiltrosCita])>
                             <x-input-label for="estado" value="Estado" class="{{ $etiqueta }}" />
                             <select id="estado" name="estado" class="{{ $claseCampo }}">
                                 <option value="">Todos</option>
@@ -90,7 +94,6 @@
                                 @endforeach
                             </select>
                         </div>
-                    @endunless
                 </div>
                 <p id="error-reporte" class="hidden mt-2 text-xs text-red-600"></p>
             </form>

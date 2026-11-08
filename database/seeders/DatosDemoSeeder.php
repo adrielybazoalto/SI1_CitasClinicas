@@ -6,6 +6,7 @@ use App\Models\Bitacora;
 use App\Models\Rol;
 use App\Services\DisponibilidadService;
 use App\Services\HorarioService;
+use App\Services\PagoService;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -686,7 +687,7 @@ class DatosDemoSeeder extends Seeder
     private function registrarPago(int $idCita, string $canal, string $tipo, float $monto, CarbonImmutable $cuando, int $recepcion, array &$cajas, int $numero): int
     {
         $enLinea = $canal === 'LINEA';
-        $metodo = $enLinea ? (['STRIPE', 'QR'][$numero % 2]) : (['EFECTIVO', 'TARJETA', 'TRANSFERENCIA'][$numero % 3]);
+        $metodo = $enLinea ? (['STRIPE', 'QR'][$numero % 2]) : (PagoService::METODOS_MOSTRADOR[$numero % 3]);
         $idCaja = null;
 
         if (! $enLinea) {

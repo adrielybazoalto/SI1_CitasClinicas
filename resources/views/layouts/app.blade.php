@@ -19,6 +19,11 @@
 
         @include('layouts.navigation')
 
+        {{-- RNF20 · Micrófono flotante del portal del paciente (esquina superior derecha) --}}
+        @if (\App\Support\MenuModulos::tieneVozGlobal(Auth::user()))
+            <x-voz-global />
+        @endif
+
         {{-- Fondo oscuro detrás del menú en celular --}}
         <div x-show="menu" x-transition.opacity @click="menu = false"
              class="fixed inset-0 z-30 bg-purple-950/40 lg:hidden" style="display: none"></div>
