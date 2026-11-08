@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests\Seguridad;
 
+use App\Rules\ClaveSegura;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 
 /**
  * CU02 · Validación del alta y la edición de usuarios.
  * username y correo se normalizan a minúsculas y deben ser únicos.
- * La contraseña (≥ 8) solo se pide en el alta.
+ * La contraseña (política de ClaveSegura) solo se pide en el alta.
  */
 class UsuarioRequest extends FormRequest
 {
@@ -41,7 +41,7 @@ class UsuarioRequest extends FormRequest
                 Rule::unique('usuario', 'correo')->ignore($idUsuario, 'id_usuario'),
             ],
             'id_rol' => ['required', 'integer', Rule::exists('rol', 'id_rol')->where('estado', true)],
-            'password' => $esAlta ? ['required', 'confirmed', Password::min(8)] : ['prohibited'],
+            'password' => $esAlta ? ClaveSegura::reglas() : ['prohibited'],
             'debe_cambiar_clave' => ['sometimes', 'boolean'],
         ];
     }

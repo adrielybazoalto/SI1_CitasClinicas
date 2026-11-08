@@ -92,7 +92,7 @@
                 @if ($esAlta)
                     <!-- Contraseña -->
                     <div x-data="{ show: false }">
-                        <x-input-label for="password" value="Contraseña (mínimo 8 caracteres)" class="text-xs font-semibold uppercase text-purple-950/80" />
+                        <x-input-label for="password" value="Contraseña (mínimo {{ config('clinica.clave_min_longitud') }} caracteres)" class="text-xs font-semibold uppercase text-purple-950/80" />
                         <div class="relative mt-1">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-400">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,7 +103,7 @@
                                    :type="show ? 'text' : 'password'" 
                                    name="password" 
                                    required 
-                                   minlength="8" 
+                                   minlength="{{ config('clinica.clave_min_longitud') }}" 
                                    autocomplete="new-password" 
                                    placeholder="••••••••"
                                    class="block w-full pl-10 pr-10 py-2.5 bg-purple-50/20 border border-purple-200/90 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20 transition-all duration-150" />
@@ -121,6 +121,7 @@
                             </button>
                         </div>
                         <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
+                        <x-requisitos-clave para="password" confirmacion="password_confirmation" />
                     </div>
 
                     <!-- Confirmar Contraseña -->
@@ -136,7 +137,7 @@
                                    :type="showConf ? 'text' : 'password'" 
                                    name="password_confirmation" 
                                    required 
-                                   minlength="8" 
+                                   minlength="{{ config('clinica.clave_min_longitud') }}" 
                                    autocomplete="new-password" 
                                    placeholder="••••••••"
                                    class="block w-full pl-10 pr-10 py-2.5 bg-purple-50/20 border border-purple-200/90 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20 transition-all duration-150" />

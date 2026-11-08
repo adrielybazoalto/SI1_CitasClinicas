@@ -7,8 +7,9 @@ use App\Models\Cita;
 use App\Models\Pago;
 use App\Services\CitaService;
 use App\Services\PagoService;
-use App\Services\PayPalService;
+use App\Services\StripeService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -17,7 +18,7 @@ use Illuminate\View\View;
 use RuntimeException;
 
 /**
- * CU14 · Pagar cita en línea (PayPal Sandbox o QR simulado).
+ * CU14 · Pagar cita en línea (tarjeta con Stripe en modo de pruebas o QR simulado).
  *
  * Controlador liviano: recibe la petición, delega en app/Services
  * y devuelve la vista o el JSON. Sin reglas del negocio aquí.
@@ -26,7 +27,7 @@ class PagoController extends Controller
 {
     public function __construct(
         private PagoService $pagos,
-        private PayPalService $paypal,
+        private StripeService $stripe,
         private CitaService $citas,
     ) {
     }
@@ -53,7 +54,7 @@ class PagoController extends Controller
         return view('citas.pagos', ['citas' => $citas, 'supervision' => $supervision]);
     }
 
-    /** Pantalla de pago: contador de la retención, PayPal y QR. */
+    /** Pantalla de pago: contador de la retención, tarjeta (Stripe) y QR. */
     public function show(Request $request, Cita $cita): View|RedirectResponse
     {
         $this->asegurarPropia($request, $cita);
@@ -65,58 +66,64 @@ class PagoController extends Controller
         }
 
         return view('citas.pagar', [
-            'cita' => $cita->load(['medico', 'especialidad']),
-            'paypalActivo' => $this->paypal->configurado(),
-            'montoUsd' => $this->paypal->montoUsd($cita),
+            'cita' => $cita->load(['medico', 'especialidad', 'paciente']),
+            'stripeActivo' => $this->stripe->configurado(),
+            'stripeKey' => config('services.stripe.key'),
+            'stripePrueba' => $this->stripe->modoPrueba(),
+            'stripeMoneda' => mb_strtoupper($this->stripe->moneda()),
+            'stripeMonto' => $this->stripe->monto($cita),
             'qr' => sprintf('VIDASALUD|%s|BOB|%s|%s', $cita->codigo, number_format((float) $cita->monto, 2, '.', ''), $cita->id_cita),
         ]);
     }
 
-    /** PayPal · crea la orden y envía al paciente a aprobarla. */
-    public function paypal(Request $request, Cita $cita): RedirectResponse
+    /**
+     * Stripe · crea el PaymentIntent y devuelve el client_secret para que
+     * Stripe Elements autorice la tarjeta en el navegador.
+     */
+    public function stripeIntencion(Request $request, Cita $cita): JsonResponse
     {
         $this->asegurarPagable($request, $cita);
 
         try {
-            $orden = $this->paypal->crearOrden($cita, route('pagos.paypal.retorno', $cita), route('pagos.paypal.cancelado', $cita));
+            $intencion = $this->stripe->crearIntencion($cita);
         } catch (RuntimeException $e) {
-            return back()->with('error', 'No se pudo conectar con PayPal. Intente de nuevo o use el pago con QR.');
+            return response()->json(['mensaje' => 'No se pudo conectar con Stripe. Intente de nuevo o use el pago con QR.'], 502);
         }
 
-        $request->session()->put("paypal.{$cita->id_cita}", $orden['id']);
+        $request->session()->put("stripe.{$cita->id_cita}", $intencion['id']);
 
-        return redirect()->away($orden['aprobar']);
+        return response()->json(['client_secret' => $intencion['client_secret']]);
     }
 
-    /** PayPal · el paciente aprobó: se captura la orden y se confirma el pago. */
-    public function paypalRetorno(Request $request, Cita $cita): RedirectResponse
+    /** Stripe · la tarjeta quedó autorizada: se captura el cobro y se confirma el pago. */
+    public function stripeConfirmar(Request $request, Cita $cita): RedirectResponse
     {
         $this->asegurarPropia($request, $cita);
-        $orden = $request->session()->pull("paypal.{$cita->id_cita}");
+        $request->validate(['payment_intent' => ['required', 'string', 'max:80']]);
+        $intencion = $request->session()->pull("stripe.{$cita->id_cita}");
 
-        // La orden debe ser la que se creó para esta cita en esta sesión.
-        if (! $orden || $request->query('token') !== $orden) {
-            return redirect()->route('pagos.show', $cita)->with('error', 'No se reconoce la orden de PayPal. Intente de nuevo.');
+        // El PaymentIntent debe ser el que se creó para esta cita en esta sesión.
+        if (! $intencion || $request->input('payment_intent') !== $intencion) {
+            return redirect()->route('pagos.show', $cita)->with('error', 'No se reconoce la operación de Stripe. Intente de nuevo.');
         }
 
-        // Antes de capturar se revisa que la cita siga pendiente y vigente: así no se cobra una reserva ya liberada.
+        if (! $this->stripe->autorizado($intencion, $cita)) {
+            return redirect()->route('pagos.show', $cita)->with('error', 'Stripe no autorizó el pago con la tarjeta. No se realizó ningún cobro.');
+        }
+
+        // Antes de capturar se revisa que la cita siga pendiente y vigente: si no, se libera la autorización.
         if (! $this->pagos->cobrable($cita->fresh()) || $this->pagos->vencida($cita->fresh())) {
+            $this->stripe->cancelar($intencion);
+
             return redirect()->route('pagos.index')->with('error', 'La reserva ya no está pendiente de pago; no se realizó ningún cobro.');
         }
 
-        $idCaptura = $this->paypal->capturar($orden, $cita);
-        if (! $idCaptura) {
-            return redirect()->route('pagos.show', $cita)->with('error', 'PayPal no confirmó el pago. No se realizó ningún cobro.');
+        $idCobro = $this->stripe->capturar($intencion);
+        if (! $idCobro) {
+            return redirect()->route('pagos.show', $cita)->with('error', 'Stripe no confirmó el pago. No se realizó ningún cobro.');
         }
 
-        return $this->confirmar($cita, 'PAYPAL', $idCaptura, $request);
-    }
-
-    public function paypalCancelado(Request $request, Cita $cita): RedirectResponse
-    {
-        $request->session()->forget("paypal.{$cita->id_cita}");
-
-        return redirect()->route('pagos.show', $cita)->with('error', 'Canceló el pago en PayPal. Puede intentarlo de nuevo mientras no venza el tiempo.');
+        return $this->confirmar($cita, 'STRIPE', $idCobro, $request);
     }
 
     /** QR · simulación de sandbox: "verificar" equivale a la confirmación del banco. */

@@ -38,7 +38,7 @@ Requisitos de la guía del docente (obligatorios): PHP, PostgreSQL con PDO `pdo_
 | Recepcionista | Registra pacientes y antecedentes, consulta fichas, programa / reprograma / cancela citas, registra llegada e inasistencia; ciclo 2: caja y cobros. |
 | Médico | Ve su agenda, ve antecedentes, registra la atención y marca la cita como Atendida (si tiene el permiso). |
 | Paciente | Ya registrado presencialmente en recepción. Consulta fichas, reserva, reprograma, cancela, ve su historial; ciclo 2: perfil y pago en línea. |
-| Pasarela de pago (externo, ciclo 2) | PayPal Sandbox / QR. |
+| Pasarela de pago (externo, ciclo 2) | Stripe (Test Mode) / QR. |
 | Temporizador (proceso automático) | Scheduler de Laravel: cancela citas con pago vencido, marca inasistencias, envía recordatorios. |
 
 El paciente **no se auto-registra**: lo registra la recepción en su primera visita (crea su cuenta con contraseña temporal).
@@ -65,7 +65,7 @@ El paciente **no se auto-registra**: lo registra la recepción en su primera vis
 | CU11 | Gestionar tarifario | Admin | 2 | Media |
 | CU12 | Consultar fichas disponibles | Paciente, Recepcionista | 1 | Alta |
 | CU13 | Programar cita (reservar ficha) | Recepcionista, Paciente | 1 | Alta |
-| CU14 | Pagar ficha en línea (PayPal / QR) | Paciente, Pasarela, Temporizador | 2 | Media |
+| CU14 | Pagar ficha en línea (tarjeta con Stripe / QR) | Paciente, Pasarela, Temporizador | 2 | Media |
 | CU15 | Reprogramar cita | Recepcionista, Paciente | 1 | Media |
 | CU16 | Cancelar cita | Recepcionista, Paciente | 1 | Media |
 | CU17 | Registrar asistencia e inasistencia | Recepcionista, Temporizador | 1 | Media |
@@ -129,7 +129,7 @@ Fichas (RN15–RN31, valores a confirmar con la clínica; ponerlos en `config/cl
 |---|---|
 | RN15 Fichas calculadas desde el horario | — |
 | RN16 Reparto de fichas por canal | 70% en línea / 30% mostrador |
-| RN17 Ventana de reserva en línea | abre 7 días antes, cierra 1 h antes del turno |
+| RN17 Ventana de reserva en línea | abre 7 días antes, cierra al iniciar el turno del médico |
 | RN18 Solo pacientes registrados presencialmente | — |
 | RN19 Límite por paciente | 1 cita por médico por día; 3 citas activas |
 | RN20 Retención para pago en línea (ciclo 2) | 15 minutos |
@@ -198,7 +198,7 @@ Script completo y probado: `vida_salud.sql`. Las migraciones de Laravel deben re
 | Autorización | **Middleware propio** sobre las tablas `rol`, `permiso`, `rol_permiso` (no usar spatie, para respetar el modelo de datos documentado) |
 | PDF | `barryvdh/laravel-dompdf` |
 | Correo | Mail de Laravel (SMTP) |
-| Pagos (ciclo 2) | PayPal REST API v2 Sandbox |
+| Pagos (ciclo 2) | Stripe PaymentIntents + Stripe Elements (Test Mode) |
 | Voz (ciclo 2) | Web Speech API del navegador |
 | Servidor local | XAMPP 8.2 (Apache) con VirtualHost a `public/`, o `php artisan serve` |
 | Control de versiones | Git + GitHub |
@@ -257,9 +257,9 @@ En `routes/console.php`, cada minuto:
 
 En Windows: Programador de tareas ejecutando `php artisan schedule:run` cada minuto (o `php artisan schedule:work` durante el desarrollo).
 
-### PayPal (ciclo 2)
+### Stripe (ciclo 2)
 
-XAMPP local no recibe webhooks. Confirmar el pago **capturando la orden al volver** de PayPal (`/pago/retorno`); usar ngrok solo si se quiere probar el webhook.
+XAMPP local no recibe webhooks. El PaymentIntent se crea con `capture_method = manual`: Stripe Elements autoriza la tarjeta en el navegador y el servidor **captura el cobro** en `/pagos/{cita}/stripe/confirmar` solo si la cita sigue pendiente y vigente (si no, cancela la autorización). Usar ngrok solo si se quiere probar el webhook. Tarjeta de prueba: `4242 4242 4242 4242`.
 
 ---
 
@@ -295,7 +295,7 @@ vida-salud/
 │   │   ├── NotificacionService.php
 │   │   ├── ReporteService.php
 │   │   ├── CajaService.php                # ciclo 2
-│   │   └── PayPalService.php              # ciclo 2
+│   │   └── StripeService.php              # ciclo 2
 │   └── Exceptions/
 │       └── FichaNoDisponibleException.php
 ├── config/

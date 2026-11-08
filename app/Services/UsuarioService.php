@@ -5,10 +5,10 @@ namespace App\Services;
 use App\Models\Bitacora;
 use App\Models\Rol;
 use App\Models\User;
+use App\Rules\ClaveSegura;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -123,7 +123,7 @@ class UsuarioService
      */
     public function restablecerClave(User $usuario): string
     {
-        $temporal = Str::password(10, symbols: false);
+        $temporal = ClaveSegura::generar();
 
         $usuario->forceFill([
             'password_hash' => Hash::make($temporal),

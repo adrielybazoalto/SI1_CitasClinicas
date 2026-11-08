@@ -23,15 +23,16 @@
 
         <!-- Contraseña -->
         <div>
-            <x-input-label for="password" value="Contraseña (mínimo 8 caracteres)" class="text-xs font-semibold uppercase text-purple-950/80" />
-            <x-text-input id="password" class="block mt-1 w-full bg-purple-50/20 border-purple-200" type="password" name="password" required autocomplete="new-password" placeholder="••••••••" />
+            <x-input-label for="password" value="Contraseña (mínimo {{ config('clinica.clave_min_longitud') }} caracteres)" class="text-xs font-semibold uppercase text-purple-950/80" />
+            <x-text-input id="password" class="block mt-1 w-full bg-purple-50/20 border-purple-200" type="password" name="password" required minlength="{{ config('clinica.clave_min_longitud') }}" autocomplete="new-password" placeholder="••••••••" />
             <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
+            <x-requisitos-clave para="password" confirmacion="password_confirmation" />
         </div>
 
         <!-- Confirmar Contraseña -->
         <div>
             <x-input-label for="password_confirmation" value="Confirmar contraseña" class="text-xs font-semibold uppercase text-purple-950/80" />
-            <x-text-input id="password_confirmation" class="block mt-1 w-full bg-purple-50/20 border-purple-200" type="password" name="password_confirmation" required autocomplete="new-password" placeholder="••••••••" />
+            <x-text-input id="password_confirmation" class="block mt-1 w-full bg-purple-50/20 border-purple-200" type="password" name="password_confirmation" required minlength="{{ config('clinica.clave_min_longitud') }}" autocomplete="new-password" placeholder="••••••••" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1.5" />
         </div>
 

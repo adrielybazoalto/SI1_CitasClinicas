@@ -46,7 +46,7 @@ class DisponibilidadService
         self::OCUPADA => 'La ficha ya no está disponible.',
         self::BLOQUEADA => 'El médico no atiende en ese horario (indisponibilidad registrada).',
         self::PASADA => 'No se pueden reservar fichas en horas pasadas.',
-        self::FUERA_VENTANA => 'La reserva en línea abre 7 días antes y cierra 1 hora antes del turno.',
+        self::FUERA_VENTANA => 'La reserva en línea abre 7 días antes y cierra al iniciar el turno del médico.',
         self::OTRO_CANAL => 'Esta ficha está reservada para atención en mostrador.',
     ];
 
@@ -235,10 +235,9 @@ class DisponibilidadService
         $fichas = [];
         $libres = 0;
 
-        // RN17: ventana de reserva en línea (abre N días antes, cierra N horas antes del turno).
+        // RN17: ventana de reserva en línea (abre N días antes y cierra al iniciar el turno del médico).
         $abre = $dia->subDays((int) config('clinica.reserva_abre_dias_antes', 7));
-        $cierra = $inicioTurno->subHours((int) config('clinica.reserva_cierra_horas_antes', 1));
-        $dentroVentana = $ahora->gte($abre) && $ahora->lte($cierra);
+        $dentroVentana = $ahora->gte($abre) && $ahora->lt($inicioTurno);
 
         for ($nro = 1; $nro <= $calculo['capacidad']; $nro++) {
             // Hora de la ficha = inicio + (n − 1) × duración.

@@ -235,9 +235,9 @@ CREATE TABLE pago (
     registrado_por  INT REFERENCES usuario(id_usuario) ON DELETE SET NULL,
     tipo            VARCHAR(10)   NOT NULL DEFAULT 'COBRO' CHECK (tipo IN ('COBRO','REEMBOLSO')),
     metodo          VARCHAR(15)   NOT NULL
-                    CHECK (metodo IN ('EFECTIVO','TARJETA','TRANSFERENCIA','PAYPAL','QR')),
+                    CHECK (metodo IN ('EFECTIVO','TARJETA','TRANSFERENCIA','PAYPAL','STRIPE','QR')),
     monto           NUMERIC(10,2) NOT NULL CHECK (monto > 0),
-    id_transaccion  VARCHAR(80),                                       -- id de PayPal o del banco
+    id_transaccion  VARCHAR(80),                                       -- id de Stripe (PaymentIntent) o del banco
     estado          VARCHAR(10)   NOT NULL DEFAULT 'APROBADO'
                     CHECK (estado IN ('PENDIENTE','APROBADO','RECHAZADO')),
     fecha_hora      TIMESTAMP     NOT NULL DEFAULT now()

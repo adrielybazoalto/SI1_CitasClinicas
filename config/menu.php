@@ -68,7 +68,7 @@ return [
             ['cu' => 'CU13', 'titulo' => 'Programar cita', 'ruta' => 'fichas.index', 'activo' => ['fichas.*'], 'permiso' => 'cita.programar',
                 'icono' => 'agenda', 'descripcion' => 'Elegir un horario libre y reservar la cita.'],
             ['cu' => 'CU14', 'titulo' => 'Pagar cita en línea', 'ruta' => 'pagos.index', 'activo' => ['pagos.*'], 'permiso' => 'pago.en_linea',
-                'icono' => 'tarjeta', 'descripcion' => 'Pago con PayPal o QR antes de que venza la reserva.'],
+                'icono' => 'tarjeta', 'descripcion' => 'Pago con tarjeta (Stripe) o QR antes de que venza la reserva.'],
             ['cu' => 'CU15', 'titulo' => 'Reprogramar cita', 'ruta' => 'citas.index', 'parametros' => ['accion' => 'reprogramar'],
                 'activo' => ['citas.*'], 'tambien' => ['citas.reprogramar', 'citas.reprogramar.update'], 'permiso' => 'cita.reprogramar',
                 'aviso' => 'Se muestran las citas programadas. Pulse «Reprogramar» en la cita que desea mover a otro horario.',

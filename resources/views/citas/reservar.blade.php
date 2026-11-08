@@ -97,7 +97,7 @@
                                    min="{{ now()->toDateString() }}"
                                    @if ($esPaciente) max="{{ now()->addDays($diasVentana)->toDateString() }}" @endif />
                             @if ($esPaciente)
-                                <p class="mt-1.5 text-[11px] text-purple-800/60">La reserva en línea abre {{ $diasVentana }} días antes y cierra {{ (int) config('clinica.reserva_cierra_horas_antes', 1) }} h antes del turno.</p>
+                                <p class="mt-1.5 text-[11px] text-purple-800/60">La reserva en línea abre {{ $diasVentana }} días antes y cierra al iniciar el turno del médico.</p>
                             @endif
                         </div>
 

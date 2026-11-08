@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Auth;
 use App\Models\Bitacora;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\ClaveSegura;
 use App\Services\BitacoraService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -37,7 +37,7 @@ class NewPasswordController extends Controller
         $request->validate([
             'token' => ['required', 'string'],
             'correo' => ['required', 'email'],
-            'password' => ['required', 'confirmed', Password::min(8)],
+            'password' => ClaveSegura::reglas(),
         ]);
 
         $idUsuario = DB::transaction(function () use ($request) {

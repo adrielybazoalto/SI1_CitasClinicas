@@ -19,6 +19,13 @@
         background: #9B5A9F;
     }
 
+    /* Oculta el ojo nativo de Edge/IE en los campos de contraseña: las vistas
+       ya tienen su propio botón de mostrar/ocultar y se veían dos iconos. */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+        display: none;
+    }
+
     /* Modern selection style */
     ::selection {
         background-color: #E8D2E8;

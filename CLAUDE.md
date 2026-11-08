@@ -144,7 +144,7 @@ En el historial de Git quedaron la contraseña de Supabase y el `APP_KEY` (`rend
 
 - [x] Ejecuta `git rm --cached .env.supabase.bak`.
 - [x] Agrega a `.gitignore` las líneas `.env.*.bak` y `*.bak`.
-- [x] Revisa `Contrasenas_de_prueba.md`: solo puede tener **usuarios de demostración**, nunca credenciales de Supabase, Render ni PayPal.
+- [x] Revisa `Contrasenas_de_prueba.md`: solo puede tener **usuarios de demostración**, nunca credenciales de Supabase, Render ni Stripe.
 - [ ] **Avisa a la usuaria** que haga esto a mano (Claude no puede hacerlo):
   1. En Supabase → Settings → Database → **Reset database password**.
   2. Actualizar la contraseña en su `.env` local y en Render → Environment.
@@ -306,11 +306,11 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 - [x] Preferencia `recibe_recordatorios` (activar o desactivar).
 - [x] Bloque "Mis próximas citas" con enlaces para reprogramar y cancelar.
 
-### P4 · CU14 Pagar cita en línea (PayPal o QR) — extiende a CU13
+### P4 · CU14 Pagar cita en línea (tarjeta con Stripe o QR) — extiende a CU13
 - [x] En una reserva por el canal LINEA: `estado_pago = Pendiente` y `vence_pago_en = creado_en + 15 min` (RN20). La pantalla muestra un contador regresivo.
-- [x] **PayPal Sandbox:** `PayPalService` con la API REST v2 (crear la orden y **capturarla al volver** en `/pago/retorno`). Las credenciales van en `.env` (`PAYPAL_CLIENT_ID`, `PAYPAL_SECRET`, `PAYPAL_MODE=sandbox`). Webhook opcional con verificación de firma (RNF16) **no implementado** (el pago se confirma al capturar la orden). Monto en USD con `clinica.paypal_tipo_cambio`.
+- [x] **Stripe Test Mode** (reemplaza a PayPal, 08/11): `StripeService` con PaymentIntents (`capture_method = manual`) y Stripe Elements (número, vencimiento y CVC). La tarjeta se autoriza en el navegador y el servidor **captura** en `/pagos/{cita}/stripe/confirmar` solo si la cita sigue pendiente; si no, cancela la autorización. Credenciales en `.env` (`STRIPE_KEY`, `STRIPE_SECRET`, `STRIPE_CURRENCY=bob`). Método `STRIPE` en `pago` (migración `2026_11_08_000004`, **pendiente de aplicar en Supabase**). Webhook (RNF16) **no implementado**.
 - [x] **QR:** genera un QR con el código de la cita y el monto, y deja un botón "Verificar pago" que simule la confirmación del banco. En la pantalla debe decir claramente que es una simulación de sandbox.
-- [x] Cuando se confirma el pago: `pago` (PAYPAL o QR, `id_transaccion`, APROBADO) → `estado_pago = Pagado` → `comprobante` → correo al paciente.
+- [x] Cuando se confirma el pago: `pago` (STRIPE o QR, `id_transaccion`, APROBADO) → `estado_pago = Pagado` → `comprobante` → correo al paciente.
 - [x] **Temporizador:** en `routes/console.php`, agrega una tarea cada minuto que cancele las citas con pago vencido, usando `CitaEstadoService` con el motivo "pago vencido".
 
 ### P4 · Comandos de voz (RNF20, RF42–RF44)
@@ -330,7 +330,7 @@ Render despliega desde `main`. El Paquete 4 está en `adriely`, y la usuaria tie
 
 ### Despliegue en Render
 - [ ] Todo integrado en `main`, con los tests en verde.
-- [ ] Variables de entorno en Render: DB (con la contraseña **nueva**), `APP_KEY` nuevo, `APP_DEBUG=false`, `SESSION_LIFETIME=15`, SMTP y PayPal sandbox.
+- [ ] Variables de entorno en Render: DB (con la contraseña **nueva**), `APP_KEY` nuevo, `APP_DEBUG=false`, `SESSION_LIFETIME=15`, SMTP y Stripe (claves de prueba).
 - [ ] **Temporizador:** el plan gratuito de Render no tiene cron. Agrega `php artisan schedule:work &` en `docker/entrypoint.sh`, antes de iniciar nginx.
 - [ ] Prueba la URL pública con los usuarios de demostración.
 

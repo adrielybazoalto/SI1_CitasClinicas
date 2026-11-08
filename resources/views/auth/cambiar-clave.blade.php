@@ -16,7 +16,7 @@
         @method('PUT')
 
         <div x-data="{ show: false }">
-            <x-input-label for="password" value="Nueva contraseña (mínimo 8 caracteres)" />
+            <x-input-label for="password" value="Nueva contraseña (mínimo {{ config('clinica.clave_min_longitud') }} caracteres)" />
             <div class="relative rounded-xl shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-400">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -27,10 +27,11 @@
                        :type="show ? 'text' : 'password'" 
                        name="password" 
                        required 
-                       minlength="8" 
+                       minlength="{{ config('clinica.clave_min_longitud') }}" 
+                       
                        autofocus 
                        autocomplete="new-password"
-                       placeholder="Mínimo 8 caracteres"
+                       placeholder="Mínimo {{ config('clinica.clave_min_longitud') }} caracteres"
                        class="block w-full pl-11 pr-11 py-2.5 bg-purple-50/20 border border-purple-200/90 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20 transition-all duration-150" />
                 <button type="button" 
                         @click="show = !show" 
@@ -46,6 +47,7 @@
                 </button>
             </div>
             <x-input-error :messages="$errors->get('password')" class="mt-1.5" />
+            <x-requisitos-clave para="password" confirmacion="password_confirmation" />
         </div>
 
         <div x-data="{ showConf: false }">
@@ -60,7 +62,8 @@
                        :type="showConf ? 'text' : 'password'" 
                        name="password_confirmation" 
                        required 
-                       minlength="8" 
+                       minlength="{{ config('clinica.clave_min_longitud') }}" 
+                       
                        autocomplete="new-password"
                        placeholder="Repita la nueva contraseña"
                        class="block w-full pl-11 pr-11 py-2.5 bg-purple-50/20 border border-purple-200/90 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20 transition-all duration-150" />

@@ -686,7 +686,7 @@ class DatosDemoSeeder extends Seeder
     private function registrarPago(int $idCita, string $canal, string $tipo, float $monto, CarbonImmutable $cuando, int $recepcion, array &$cajas, int $numero): int
     {
         $enLinea = $canal === 'LINEA';
-        $metodo = $enLinea ? (['PAYPAL', 'QR'][$numero % 2]) : (['EFECTIVO', 'TARJETA', 'TRANSFERENCIA'][$numero % 3]);
+        $metodo = $enLinea ? (['STRIPE', 'QR'][$numero % 2]) : (['EFECTIVO', 'TARJETA', 'TRANSFERENCIA'][$numero % 3]);
         $idCaja = null;
 
         if (! $enLinea) {

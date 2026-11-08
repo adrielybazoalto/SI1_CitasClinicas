@@ -28,7 +28,7 @@ class PagoService
     public const APROBADO = 'APROBADO';
 
     public const METODOS_MOSTRADOR = ['EFECTIVO', 'TARJETA', 'TRANSFERENCIA'];
-    public const METODOS_LINEA = ['PAYPAL', 'QR'];
+    public const METODOS_LINEA = ['STRIPE', 'QR'];
 
     /** Candado de transacción para el número correlativo del comprobante. */
     private const CANDADO_COMPROBANTE = 4202619;
@@ -105,7 +105,7 @@ class PagoService
     }
 
     /**
-     * Confirma un pago en línea (PayPal capturado o QR verificado):
+     * Confirma un pago en línea (Stripe capturado o QR verificado):
      * pago APROBADO con id de transacción, cita Pagada y comprobante.
      *
      * @throws ValidationException

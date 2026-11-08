@@ -83,10 +83,10 @@ class PerfilTest extends TestCase
     public function test_cambia_su_contrasena_verificando_la_actual(): void
     {
         $this->actingAs($this->maria)->from(route('perfil.edit'))->put(route('password.update'), [
-            'current_password' => 'p6543210@2026', 'password' => 'nuevaClave2026', 'password_confirmation' => 'nuevaClave2026',
+            'current_password' => 'p6543210@2026', 'password' => 'Nueva#26', 'password_confirmation' => 'Nueva#26',
         ])->assertRedirect(route('perfil.edit'));
 
-        $this->assertTrue(Hash::check('nuevaClave2026', $this->maria->fresh()->password_hash));
+        $this->assertTrue(Hash::check('Nueva#26', $this->maria->fresh()->password_hash));
     }
 
     public function test_el_personal_no_tiene_perfil_de_paciente(): void

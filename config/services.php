@@ -35,11 +35,12 @@ return [
         ],
     ],
 
-    // CU14 · PayPal REST v2 (sandbox o live)
-    'paypal' => [
-        'client_id' => env('PAYPAL_CLIENT_ID'),
-        'secret' => env('PAYPAL_SECRET'),
-        'mode' => env('PAYPAL_MODE', 'sandbox'),
+    // CU14 · Stripe (claves pk_test_/sk_test_ = Test Mode). La moneda debe
+    // estar habilitada en la cuenta: bob (bolivianos) o usd (con clinica.tipo_cambio_usd).
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+        'moneda' => env('STRIPE_CURRENCY', 'bob'),
     ],
 
 ];

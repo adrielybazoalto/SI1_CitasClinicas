@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\Bitacora;
 use App\Http\Controllers\Controller;
+use App\Rules\ClaveSegura;
 use App\Services\BitacoraService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -28,7 +28,7 @@ class PasswordController extends Controller
     {
         $validated = $request->validateWithBag('updatePassword', [
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', Password::min(8), 'confirmed'],
+            'password' => ClaveSegura::reglas(),
         ]);
 
         $this->guardarClave($request, $validated['password']);
@@ -54,7 +54,7 @@ class PasswordController extends Controller
     public function cambiarObligatorio(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'password' => ['required', Password::min(8), 'confirmed'],
+            'password' => ClaveSegura::reglas(),
         ], [], ['password' => 'nueva contraseña']);
 
         if (Hash::check($validated['password'], $request->user()->password_hash)) {

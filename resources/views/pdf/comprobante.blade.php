@@ -8,14 +8,18 @@
     <style>
         @page { margin: 28px 30px; }
         body { font-family: DejaVu Sans, sans-serif; font-size: 10px; color: #1f2937; }
-        .cab { border-bottom: 2px solid #5a215e; padding-bottom: 8px; margin-bottom: 12px; }
+        /* Cabecera en tabla (no float): dompdf no estira el contenedor con un float
+           y la línea inferior cruzaba la fecha de emisión. */
+        .cab { margin-bottom: 12px; }
+        .cab td { border-bottom: 2px solid #5a215e; padding: 0 0 8px; vertical-align: middle; }
         .logo { display: inline-block; width: 30px; height: 30px; background: #5a215e; border-radius: 7px; position: relative; vertical-align: middle; }
         .logo .v { position: absolute; left: 12px; top: 5px; width: 6px; height: 20px; background: #fff; }
         .logo .h { position: absolute; left: 5px; top: 12px; width: 20px; height: 6px; background: #fff; }
         .marca { display: inline-block; vertical-align: middle; margin-left: 6px; }
         .marca b { font-size: 14px; color: #2e0b31; }
-        .numero { float: right; text-align: right; }
+        .numero { text-align: right; line-height: 1.45; }
         .numero b { font-size: 14px; color: #5a215e; }
+        .numero .fecha { color: #6b7280; }
         table { width: 100%; border-collapse: collapse; }
         td { padding: 5px 0; border-bottom: 1px solid #f3f4f6; }
         td.e { color: #6b7280; width: 38%; }
@@ -24,11 +28,19 @@
     </style>
 </head>
 <body>
-    <div class="cab">
-        <div class="numero">COMPROBANTE<br><b>N.º {{ $pago->comprobante->numero }}</b><br>{{ $pago->comprobante->fecha_emision->format('d/m/Y H:i') }}</div>
-        <div class="logo"><div class="v"></div><div class="h"></div></div>
-        <div class="marca"><b>Clínica Vida Salud</b><br>Comprobante interno de pago</div>
-    </div>
+    <table class="cab">
+        <tr>
+            <td>
+                <div class="logo"><div class="v"></div><div class="h"></div></div>
+                <div class="marca"><b>Clínica Vida Salud</b><br>Comprobante interno de pago</div>
+            </td>
+            <td class="numero">
+                COMPROBANTE<br>
+                <b>N.º {{ $pago->comprobante->numero }}</b><br>
+                <span class="fecha">{{ $pago->comprobante->fecha_emision->format('d/m/Y H:i') }}</span>
+            </td>
+        </tr>
+    </table>
 
     <table>
         <tr><td class="e">Paciente</td><td>{{ $cita->paciente->apellidos }}, {{ $cita->paciente->nombres }} · CI {{ $cita->paciente->ci }}</td></tr>

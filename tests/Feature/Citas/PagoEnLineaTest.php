@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
-/** P4 · CU14 Pagar cita en línea (PayPal Sandbox y QR) y RN20. Hoy: 11/11/2026 10:00. */
+/** P4 · CU14 Pagar cita en línea (tarjeta con Stripe en Test Mode y QR) y RN20. Hoy: 11/11/2026 10:00. */
 class PagoEnLineaTest extends TestCase
 {
     use RefreshDatabase;
@@ -94,42 +94,141 @@ class PagoEnLineaTest extends TestCase
         $this->actingAs($this->maria)->get(route('pagos.comprobante', $this->cita))->assertOk()->assertHeader('content-type', 'application/pdf');
     }
 
-    public function test_paypal_crea_la_orden_y_captura_al_volver(): void
+    /* ---------------- Stripe (Test Mode) ---------------- */
+
+    private function configurarStripe(): void
     {
-        config(['services.paypal.client_id' => 'cliente', 'services.paypal.secret' => 'secreto']);
-        Http::fake([
-            '*/v1/oauth2/token' => Http::response(['access_token' => 'tok']),
-            '*/v2/checkout/orders' => Http::response(['id' => 'ORDEN-1', 'links' => [['rel' => 'approve', 'href' => 'https://sandbox.paypal.com/aprobar?token=ORDEN-1']]], 201),
-            '*/v2/checkout/orders/ORDEN-1/capture' => Http::response(['status' => 'COMPLETED', 'purchase_units' => [[
-                'custom_id' => (string) $this->cita->id_cita,
-                'payments' => ['captures' => [['id' => 'CAP-99', 'status' => 'COMPLETED']]],
-            ]]]),
-        ]);
-
-        $this->actingAs($this->maria)->post(route('pagos.paypal', $this->cita))
-            ->assertRedirect('https://sandbox.paypal.com/aprobar?token=ORDEN-1');
-
-        // Monto en USD con el tipo de cambio: 139,20 / 6,96 = 20,00.
-        Http::assertSent(fn ($r) => str_ends_with($r->url(), '/v2/checkout/orders') && $r['purchase_units'][0]['amount']['value'] === '20.00');
-
-        $this->actingAs($this->maria)->get(route('pagos.paypal.retorno', ['cita' => $this->cita, 'token' => 'ORDEN-1']))
-            ->assertRedirect(route('pagos.index'));
-
-        $this->assertSame('Pagado', $this->cita->fresh()->estado_pago);
-        $this->assertDatabaseHas('pago', ['metodo' => 'PAYPAL', 'id_transaccion' => 'CAP-99']);
+        config(['services.stripe.key' => 'pk_test_clave', 'services.stripe.secret' => 'sk_test_secreto', 'services.stripe.moneda' => 'bob']);
     }
 
-    public function test_paypal_no_cobra_si_la_orden_no_coincide(): void
+    /** Respuesta de Stripe al consultar el PaymentIntent pi_123 de la cita. */
+    private function intencion(string $estado, ?int $idCita = null, int $monto = 13920): array
     {
-        config(['services.paypal.client_id' => 'cliente', 'services.paypal.secret' => 'secreto']);
+        return ['id' => 'pi_123', 'status' => $estado, 'amount' => $monto, 'currency' => 'bob',
+            'metadata' => ['id_cita' => (string) ($idCita ?? $this->cita->id_cita), 'codigo' => 'CM-000001']];
+    }
+
+    public function test_pantalla_muestra_el_formulario_de_stripe_elements(): void
+    {
+        $this->configurarStripe();
+
+        $this->actingAs($this->maria)->get(route('pagos.show', $this->cita))
+            ->assertOk()
+            ->assertSee('https://js.stripe.com/v3/', false)
+            ->assertSee('id="stripe-numero"', false)
+            ->assertSee('id="stripe-vencimiento"', false)
+            ->assertSee('id="stripe-cvc"', false)
+            ->assertSee('id="submit-button"', false)
+            ->assertSee('Pagar BOB 139,20')
+            ->assertSee('pk_test_clave')
+            ->assertDontSee('sk_test_secreto')
+            ->assertSee('Modo de pruebas de Stripe')
+            ->assertSee('BOB 139,20');
+    }
+
+    public function test_sin_claves_de_stripe_solo_se_ofrece_el_qr(): void
+    {
+        config(['services.stripe.key' => null, 'services.stripe.secret' => null]);
+
+        $this->actingAs($this->maria)->get(route('pagos.show', $this->cita))
+            ->assertOk()
+            ->assertSee('El pago con tarjeta no está configurado')
+            ->assertDontSee('js.stripe.com', false);
+    }
+
+    public function test_stripe_autoriza_captura_marca_pagado_y_emite_comprobante(): void
+    {
+        $this->configurarStripe();
+        Http::fake([
+            'api.stripe.com/v1/payment_intents' => Http::response(['id' => 'pi_123', 'client_secret' => 'pi_123_secret_abc']),
+            'api.stripe.com/v1/payment_intents/pi_123' => Http::response($this->intencion('requires_capture')),
+            'api.stripe.com/v1/payment_intents/pi_123/capture' => Http::response(['id' => 'pi_123', 'status' => 'succeeded']),
+        ]);
+
+        // 1) Se crea el PaymentIntent: en bolivianos, en centavos y con captura manual.
+        $this->actingAs($this->maria)->postJson(route('pagos.stripe.intencion', $this->cita))
+            ->assertOk()
+            ->assertJson(['client_secret' => 'pi_123_secret_abc']);
+        Http::assertSent(fn ($r) => $r->url() === 'https://api.stripe.com/v1/payment_intents'
+            && $r['amount'] == 13920 && $r['currency'] === 'bob' && $r['capture_method'] === 'manual'
+            && $r['automatic_payment_methods']['allow_redirects'] === 'never' && ! isset($r['payment_method_types'])
+            && $r['metadata']['id_cita'] == $this->cita->id_cita
+            && $r->hasHeader('Authorization', 'Bearer sk_test_secreto'));
+
+        // 2) Stripe Elements autorizó la tarjeta en el navegador; 3) el servidor captura.
+        $this->actingAs($this->maria)->post(route('pagos.stripe.confirmar', $this->cita), ['payment_intent' => 'pi_123'])
+            ->assertRedirect(route('pagos.index'))
+            ->assertSessionHas('status');
+
+        Http::assertSent(fn ($r) => str_ends_with($r->url(), '/payment_intents/pi_123/capture'));
+        $this->assertSame('Pagado', $this->cita->fresh()->estado_pago);
+        $pago = Pago::with('comprobante')->firstOrFail();
+        $this->assertSame('STRIPE', $pago->metodo);
+        $this->assertSame('pi_123', $pago->id_transaccion);
+        $this->assertNull($pago->id_caja);
+        $this->assertSame(1001, $pago->comprobante->numero);
+        $this->assertDatabaseHas('bitacora', ['accion' => 'PAGO_EN_LINEA']);
+
+        $this->actingAs($this->maria)->get(route('pagos.comprobante', $this->cita))->assertOk()->assertHeader('content-type', 'application/pdf');
+    }
+
+    public function test_stripe_no_cobra_si_el_payment_intent_no_es_el_de_la_sesion(): void
+    {
+        $this->configurarStripe();
         Http::fake();
 
-        $this->actingAs($this->maria)->withSession(['paypal.'.$this->cita->id_cita => 'ORDEN-1'])
-            ->get(route('pagos.paypal.retorno', ['cita' => $this->cita, 'token' => 'OTRA']))
+        $this->actingAs($this->maria)->withSession(['stripe.'.$this->cita->id_cita => 'pi_123'])
+            ->post(route('pagos.stripe.confirmar', $this->cita), ['payment_intent' => 'pi_otro'])
             ->assertRedirect(route('pagos.show', $this->cita));
 
         $this->assertSame(0, Pago::count());
         Http::assertNothingSent();
+    }
+
+    public function test_stripe_no_captura_si_la_tarjeta_no_fue_autorizada(): void
+    {
+        $this->configurarStripe();
+        Http::fake(['api.stripe.com/v1/payment_intents/pi_123' => Http::response($this->intencion('requires_payment_method'))]);
+
+        $this->actingAs($this->maria)->withSession(['stripe.'.$this->cita->id_cita => 'pi_123'])
+            ->post(route('pagos.stripe.confirmar', $this->cita), ['payment_intent' => 'pi_123'])
+            ->assertRedirect(route('pagos.show', $this->cita))
+            ->assertSessionHas('error');
+
+        Http::assertNotSent(fn ($r) => str_ends_with($r->url(), '/capture'));
+        $this->assertSame('Pendiente', $this->cita->fresh()->estado_pago);
+    }
+
+    public function test_stripe_libera_la_autorizacion_si_la_reserva_vencio(): void
+    {
+        $this->configurarStripe();
+        Http::fake([
+            'api.stripe.com/v1/payment_intents/pi_123' => Http::response($this->intencion('requires_capture')),
+            'api.stripe.com/v1/payment_intents/pi_123/cancel' => Http::response(['id' => 'pi_123', 'status' => 'canceled']),
+        ]);
+        Carbon::setTestNow('2026-11-11 10:16');
+        CarbonImmutable::setTestNow('2026-11-11 10:16');
+
+        $this->actingAs($this->maria)->withSession(['stripe.'.$this->cita->id_cita => 'pi_123'])
+            ->post(route('pagos.stripe.confirmar', $this->cita), ['payment_intent' => 'pi_123'])
+            ->assertRedirect(route('pagos.index'));
+
+        Http::assertSent(fn ($r) => str_ends_with($r->url(), '/payment_intents/pi_123/cancel'));
+        Http::assertNotSent(fn ($r) => str_ends_with($r->url(), '/capture'));
+        $this->assertSame(0, Pago::count());
+    }
+
+    public function test_stripe_no_acepta_un_payment_intent_de_otra_cita(): void
+    {
+        $this->configurarStripe();
+        Http::fake(['api.stripe.com/v1/payment_intents/pi_123' => Http::response($this->intencion('requires_capture', 999))]);
+
+        $this->actingAs($this->maria)->withSession(['stripe.'.$this->cita->id_cita => 'pi_123'])
+            ->post(route('pagos.stripe.confirmar', $this->cita), ['payment_intent' => 'pi_123'])
+            ->assertRedirect(route('pagos.show', $this->cita));
+
+        Http::assertNotSent(fn ($r) => str_ends_with($r->url(), '/capture'));
+        $this->assertSame(0, Pago::count());
     }
 
     public function test_no_se_paga_la_cita_de_otro_paciente(): void

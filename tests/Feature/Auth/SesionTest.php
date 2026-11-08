@@ -112,13 +112,13 @@ class SesionTest extends TestCase
             ->from(route('profile.edit'))
             ->put(route('password.update'), [
                 'current_password' => 'secreto123',
-                'password' => 'nuevaClave2026',
-                'password_confirmation' => 'nuevaClave2026',
+                'password' => 'Nueva#26',
+                'password_confirmation' => 'Nueva#26',
             ])
             ->assertSessionHasNoErrors()
             ->assertRedirect(route('profile.edit'));
 
-        $this->assertTrue(Hash::check('nuevaClave2026', $this->usuario->fresh()->password_hash));
+        $this->assertTrue(Hash::check('Nueva#26', $this->usuario->fresh()->password_hash));
         $this->assertDatabaseHas('bitacora', ['accion' => Bitacora::CAMBIO_CLAVE]);
     }
 
@@ -128,8 +128,8 @@ class SesionTest extends TestCase
             ->from(route('profile.edit'))
             ->put(route('password.update'), [
                 'current_password' => 'otra',
-                'password' => 'nuevaClave2026',
-                'password_confirmation' => 'nuevaClave2026',
+                'password' => 'Nueva#26',
+                'password_confirmation' => 'Nueva#26',
             ])
             ->assertSessionHasErrorsIn('updatePassword', 'current_password');
     }

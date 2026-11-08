@@ -188,15 +188,14 @@ Route::middleware('auth')->group(function () {
             Route::patch('/{cita}/cancelar', 'cancelar')->middleware('permiso:cita.cancelar')->name('cancelar');
         });
 
-    // Citas · CU14 Pagar cita en línea (PayPal Sandbox o QR simulado)
+    // Citas · CU14 Pagar cita en línea (tarjeta con Stripe o QR simulado)
     Route::prefix('pagos')->name('pagos.')
         ->middleware('permiso:pago.en_linea')
         ->controller(PagoController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/{cita}', 'show')->name('show');
-            Route::post('/{cita}/paypal', 'paypal')->name('paypal');
-            Route::get('/{cita}/paypal/retorno', 'paypalRetorno')->name('paypal.retorno');
-            Route::get('/{cita}/paypal/cancelado', 'paypalCancelado')->name('paypal.cancelado');
+            Route::post('/{cita}/stripe/intencion', 'stripeIntencion')->name('stripe.intencion');
+            Route::post('/{cita}/stripe/confirmar', 'stripeConfirmar')->name('stripe.confirmar');
             Route::post('/{cita}/qr', 'qr')->name('qr');
             Route::get('/{cita}/comprobante', 'comprobante')->name('comprobante');
         });

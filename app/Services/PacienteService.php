@@ -7,6 +7,7 @@ use App\Models\Antecedente;
 use App\Models\Paciente;
 use App\Models\Rol;
 use App\Models\User;
+use App\Rules\ClaveSegura;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -72,7 +73,7 @@ class PacienteService
     {
         return DB::transaction(function () use ($datos, $actor) {
             $codigo = $this->codigos->paciente();
-            $claveTemporal = Str::password(10, symbols: false);
+            $claveTemporal = ClaveSegura::generar();
             $ci = trim((string) $datos['ci']);
             $username = mb_strtolower($ci);
             $correo = ($datos['correo'] ?? null) ?: $this->correoPlaceholder($username);

@@ -215,6 +215,27 @@ class CitaTest extends TestCase
         $this->assertSame('fuera_ventana', $fichas[1]['estado']);
     }
 
+    public function test_la_reserva_en_linea_cierra_al_iniciar_el_turno(): void
+    {
+        $paciente = $this->crearPaciente();
+
+        // Turno de 08:00: a las 07:59 todavía se puede reservar en línea (antes cerraba a las 07:00).
+        $this->viajarA(self::LUNES.' 07:59');
+        $fichas = collect($this->fichas($paciente->usuario))->keyBy('nro');
+        $this->assertSame('libre', $fichas[1]['estado']);
+        $this->assertSame('libre', $fichas[8]['estado']);
+
+        // A las 08:00 en punto empieza el turno: la reserva en línea se cierra.
+        $this->viajarA(self::LUNES.' 08:00');
+        $fichas = collect($this->fichas($paciente->usuario))->keyBy('nro');
+        $this->assertSame('pasada', $fichas[1]['estado']);
+        $this->assertSame('fuera_ventana', $fichas[2]['estado']);
+
+        // En mostrador se siguen ofreciendo las fichas que aún no pasaron.
+        $fichas = collect($this->fichas($this->recepcion))->keyBy('nro');
+        $this->assertSame('libre', $fichas[2]['estado']);
+    }
+
     public function test_dia_sin_horario_y_fecha_pasada(): void
     {
         $this->actingAs($this->recepcion)

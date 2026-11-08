@@ -5,7 +5,7 @@
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
-            Asegúrese de que su cuenta utilice una contraseña segura de al menos 8 caracteres para proteger su acceso.
+            Use una contraseña segura de al menos {{ config('clinica.clave_min_longitud') }} caracteres, con al menos una mayúscula, una minúscula, un número y un carácter especial.
         </p>
     </header>
 
@@ -21,8 +21,9 @@
 
         <div>
             <x-input-label for="update_password_password" value="Nueva contraseña" class="text-xs font-semibold uppercase text-purple-950/80" />
-            <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full bg-purple-50/20 border-purple-200" autocomplete="new-password" placeholder="Mínimo 8 caracteres" />
+            <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full bg-purple-50/20 border-purple-200" autocomplete="new-password" placeholder="Mínimo {{ config('clinica.clave_min_longitud') }} caracteres" />
             <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-1.5" />
+            <x-requisitos-clave para="update_password_password" confirmacion="update_password_password_confirmation" />
         </div>
 
         <div>
