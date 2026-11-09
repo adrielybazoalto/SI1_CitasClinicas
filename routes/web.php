@@ -220,6 +220,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/atender', 'create')->name('create');
             Route::post('/atender', 'store')->name('store');
         });
+    Route::get('/atencion/{atencion}/receta', [AtencionController::class, 'receta'])
+        ->middleware('permiso:atencion.registrar')
+        ->whereNumber('atencion')
+        ->name('atencion.receta');
 
     // Atención · CU22 Consultar historial del paciente
     Route::prefix('atencion/historial')->name('historial.')

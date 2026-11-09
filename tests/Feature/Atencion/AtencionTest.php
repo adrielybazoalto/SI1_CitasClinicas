@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Atencion;
 
+use App\Models\Atencion;
 use App\Models\Cita;
 use App\Models\Especialidad;
 use App\Models\Medico;
@@ -137,7 +138,7 @@ class AtencionTest extends TestCase
     {
         $this->actingAs($this->usuarioPerez)
             ->post(route('atencion.store', $this->confirmada), $this->datos())
-            ->assertRedirect(route('agenda.index', ['fecha' => self::HOY, 'accion' => 'atender']))
+            ->assertRedirect(route('atencion.create', $this->confirmada))
             ->assertSessionHas('status');
 
         $this->assertDatabaseHas('atencion', [
@@ -234,6 +235,37 @@ class AtencionTest extends TestCase
             ->get(route('agenda.index'))
             ->assertOk()
             ->assertSee(route('atencion.create', $this->confirmada), false);
+    }
+
+    public function test_al_guardar_muestra_el_exito_y_el_boton_imprimir_receta(): void
+    {
+        $respuesta = $this->actingAs($this->usuarioPerez)
+            ->followingRedirects()
+            ->post(route('atencion.store', $this->confirmada), $this->datos());
+
+        $atencion = Atencion::where('id_cita', $this->confirmada->id_cita)->firstOrFail();
+
+        $respuesta->assertOk()
+            ->assertSee('Atención registrada')
+            ->assertSee('Imprimir receta')
+            ->assertSee(route('atencion.receta', $atencion), false)
+            ->assertSee('target="_blank"', false)
+            ->assertDontSee('id="form-atencion"', false);
+    }
+
+    public function test_solo_el_medico_de_la_cita_imprime_la_receta(): void
+    {
+        $this->actingAs($this->usuarioPerez)->post(route('atencion.store', $this->confirmada), $this->datos());
+        $atencion = Atencion::where('id_cita', $this->confirmada->id_cita)->firstOrFail();
+
+        $this->actingAs($this->usuarioPerez)
+            ->get(route('atencion.receta', $atencion))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+
+        $this->actingAs($this->usuarioVaca)
+            ->get(route('atencion.receta', $atencion))
+            ->assertForbidden();
     }
 
     public function test_actualizar_antecedentes_vuelve_a_la_pantalla_de_atencion(): void

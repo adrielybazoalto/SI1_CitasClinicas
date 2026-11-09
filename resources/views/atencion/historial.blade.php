@@ -3,6 +3,8 @@
     $claseCampo = 'mt-1 block w-full px-3.5 py-2.5 bg-purple-50/20 border border-purple-200/90 rounded-xl text-sm text-gray-800 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20 transition-all duration-150';
     $etiqueta = 'text-xs font-semibold uppercase text-purple-950/80';
     $columnas = $conDetalle ? 6 : 5;
+    // Solo el médico de la cita puede imprimir su receta.
+    $idMedicoActual = $conDetalle ? (int) Auth::user()->medico?->id_medico : 0;
 @endphp
 <x-app-layout>
     <x-slot name="header">
@@ -124,6 +126,10 @@
                                                         @endif
                                                     </dl>
                                                 </details>
+                                                @if ($idMedicoActual && (int) $cita->id_medico === $idMedicoActual)
+                                                    <a href="{{ route('atencion.receta', $cita->atencion) }}" target="_blank"
+                                                       class="inline-block mt-2 text-xs font-semibold text-purple-800 hover:text-purple-950 hover:underline">Imprimir receta</a>
+                                                @endif
                                             @else
                                                 <span class="text-xs text-gray-400">—</span>
                                             @endif

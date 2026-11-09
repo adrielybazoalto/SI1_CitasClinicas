@@ -5,6 +5,7 @@
     $alergias = trim((string) $antecedente?->alergias);
     $tieneAlergias = $alergias !== '' && ! preg_match('/^(ninguna|no|niega)/i', $alergias);
     $volver = route('agenda.index', ['fecha' => $cita->fecha->toDateString(), 'accion' => 'atender']);
+    $atencion ??= null;
 @endphp
 <x-app-layout>
     <x-slot name="header">
@@ -16,7 +17,7 @@
             </a>
             <div>
                 <x-encabezado-modulo />
-                <h2 class="text-3xl font-bold text-gray-900 leading-tight">Registrar atención</h2>
+                <h2 class="text-3xl font-bold text-gray-900 leading-tight">{{ $atencion ? 'Atención registrada' : 'Registrar atención' }}</h2>
                 <p class="text-sm text-gray-500">
                     Cita {{ $cita->codigo }} · {{ $cita->fecha->format('d/m/Y') }} {{ $cita->hora_inicio_corta }} · {{ ucfirst($cita->especialidad?->nombre) }}
                 </p>
@@ -82,6 +83,10 @@
                                 @if ($previa->atencion?->tratamiento)
                                     <p class="text-xs text-gray-600">{{ $previa->atencion->tratamiento }}</p>
                                 @endif
+                                @if ($previa->atencion && (int) $previa->id_medico === (int) $cita->id_medico)
+                                    <a href="{{ route('atencion.receta', $previa->atencion) }}" target="_blank"
+                                       class="inline-block mt-1 text-xs font-semibold text-purple-800 hover:text-purple-950 hover:underline">Imprimir receta</a>
+                                @endif
                             </div>
                         @empty
                             <p class="mt-3 text-sm text-gray-500">Primera atención del paciente en la clínica.</p>
@@ -89,6 +94,50 @@
                     </div>
                 </aside>
 
+                @if ($atencion)
+                <!-- Atención ya registrada: resumen y receta -->
+                <section class="lg:col-span-2 lg:order-1 bg-white p-6 sm:p-8 shadow-xs border border-emerald-200 rounded-2xl space-y-5">
+                    <div class="flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900">
+                        <svg class="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-bold">La cita {{ $cita->codigo }} quedó Atendida.</p>
+                            <p class="text-xs">Atención registrada el {{ $atencion->registrado_en?->format('d/m/Y H:i') }}. Ya puede imprimir la receta para el paciente.</p>
+                        </div>
+                    </div>
+
+                    <dl class="space-y-3 text-sm">
+                        <div><dt class="{{ $etiqueta }}">Diagnóstico</dt><dd class="mt-1 text-gray-800 whitespace-pre-line">{{ $atencion->diagnostico }}</dd></div>
+                        <div><dt class="{{ $etiqueta }}">Tratamiento</dt><dd class="mt-1 text-gray-800 whitespace-pre-line">{{ $atencion->tratamiento ?: '—' }}</dd></div>
+                        <div>
+                            <dt class="{{ $etiqueta }}">Signos vitales</dt>
+                            <dd class="mt-1 text-gray-800">
+                                {{ collect([
+                                    $atencion->peso_kg ? $atencion->peso_kg.' kg' : null,
+                                    $atencion->talla_cm ? $atencion->talla_cm.' cm' : null,
+                                    $atencion->presion_arterial ? 'PA '.$atencion->presion_arterial : null,
+                                    $atencion->temperatura_c ? $atencion->temperatura_c.' °C' : null,
+                                ])->filter()->join(' · ') ?: '—' }}
+                            </dd>
+                        </div>
+                        @if ($atencion->observaciones)
+                            <div><dt class="{{ $etiqueta }}">Observaciones</dt><dd class="mt-1 text-gray-800">{{ $atencion->observaciones }}</dd></div>
+                        @endif
+                    </dl>
+
+                    <div class="flex items-center justify-end gap-3 pt-3 border-t border-purple-100/80">
+                        <a href="{{ $volver }}" class="px-4 py-2.5 text-xs font-semibold text-purple-800 hover:text-purple-950 hover:bg-purple-50 rounded-xl transition-colors">Volver a la agenda</a>
+                        <a href="{{ route('atencion.receta', $atencion) }}" target="_blank" rel="noopener"
+                           class="inline-flex items-center gap-2 px-6 py-2.5 bg-purple-800 hover:bg-purple-900 rounded-xl font-semibold text-xs text-white uppercase tracking-wider shadow-sm transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                            </svg>
+                            Imprimir receta
+                        </a>
+                    </div>
+                </section>
+                @else
                 <!-- Formulario de la atención -->
                 <form method="POST" action="{{ route('atencion.store', $cita) }}" id="form-atencion" novalidate
                       class="lg:col-span-2 lg:order-1 bg-white p-6 sm:p-8 shadow-xs border border-purple-100 rounded-2xl space-y-5">
@@ -149,10 +198,12 @@
                         </button>
                     </div>
                 </form>
+                @endif
             </div>
         </div>
     </div>
 
+    @unless ($atencion)
     <script>
         // Validación en el cliente (la del servidor es la definitiva).
         document.getElementById('form-atencion').addEventListener('submit', function (e) {
@@ -178,4 +229,5 @@
             }
         });
     </script>
+    @endunless
 </x-app-layout>
